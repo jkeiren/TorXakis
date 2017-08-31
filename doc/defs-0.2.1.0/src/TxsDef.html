@@ -1,0 +1,47 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-
+TorXakis - Model Based Testing
+Copyright (c) 2015-2017 TNO and Radboud University
+See LICENSE at root directory of this repository.
+-}</span><span>
+</span><a name="line-6"></a><span>
+</span><a name="line-7"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-8"></a><span class="hs-comment">--</span><span>
+</span><a name="line-9"></a><span class="hs-comment">-- TorXakis Interal Data Type Definitions:</span><span>
+</span><a name="line-10"></a><span class="hs-comment">--</span><span>
+</span><a name="line-11"></a><span class="hs-comment">--   *  General     :  general definitions</span><span>
+</span><a name="line-12"></a><span class="hs-comment">--   *  Frontend    :  (static) abstract syntax definitions for the TorXakis Language (.txs)</span><span>
+</span><a name="line-13"></a><span class="hs-comment">--   *  Connections :  connections to outside world</span><span>
+</span><a name="line-14"></a><span class="hs-comment">--</span><span>
+</span><a name="line-15"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-16"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">TxsDef</span><span>
+</span><a name="line-17"></a><span class="hs-keyword">where</span><span>
+</span><a name="line-18"></a><span>
+</span><a name="line-19"></a><span class="hs-keyword">import</span><span> </span><a href="CnectDef.html"><span class="hs-identifier">CnectDef</span></a><span>
+</span><a name="line-20"></a><span class="hs-keyword">import</span><span> </span><a href="CstrDef.html"><span class="hs-identifier">CstrDef</span></a><span>
+</span><a name="line-21"></a><span class="hs-keyword">import</span><span> </span><a href="FuncDef.html"><span class="hs-identifier">FuncDef</span></a><span>
+</span><a name="line-22"></a><span class="hs-keyword">import</span><span> </span><a href="MapperDef.html"><span class="hs-identifier">MapperDef</span></a><span>
+</span><a name="line-23"></a><span class="hs-keyword">import</span><span> </span><a href="ModelDef.html"><span class="hs-identifier">ModelDef</span></a><span>
+</span><a name="line-24"></a><span class="hs-keyword">import</span><span> </span><a href="ProcDef.html"><span class="hs-identifier">ProcDef</span></a><span>
+</span><a name="line-25"></a><span class="hs-keyword">import</span><span> </span><a href="PurpDef.html"><span class="hs-identifier">PurpDef</span></a><span>
+</span><a name="line-26"></a><span class="hs-keyword">import</span><span> </span><a href="SortDef.html"><span class="hs-identifier">SortDef</span></a><span>
+</span><a name="line-27"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-28"></a><span class="hs-comment">-- torxakis definitions</span><span>
+</span><a name="line-29"></a><span>
+</span><a name="line-30"></a><span class="hs-keyword">data</span><span>  </span><a name="TxsDef"><a href="TxsDef.html#TxsDef"><span class="hs-identifier">TxsDef</span></a></a><span>        </span><span class="hs-glyph">=</span><span>  </span><a name="DefSort"><a href="TxsDef.html#DefSort"><span class="hs-identifier">DefSort</span></a></a><span>      </span><a href="SortDef.html#SortDef"><span class="hs-identifier hs-type">SortDef</span></a><span>
+</span><a name="line-31"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefCstr"><a href="TxsDef.html#DefCstr"><span class="hs-identifier">DefCstr</span></a></a><span>      </span><a href="CstrDef.html#CstrDef"><span class="hs-identifier hs-type">CstrDef</span></a><span>
+</span><a name="line-32"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefFunc"><a href="TxsDef.html#DefFunc"><span class="hs-identifier">DefFunc</span></a></a><span>      </span><a href="FuncDef.html#FuncDef"><span class="hs-identifier hs-type">FuncDef</span></a><span>
+</span><a name="line-33"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefProc"><a href="TxsDef.html#DefProc"><span class="hs-identifier">DefProc</span></a></a><span>      </span><a href="ProcDef.html#ProcDef"><span class="hs-identifier hs-type">ProcDef</span></a><span>
+</span><a name="line-34"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefModel"><a href="TxsDef.html#DefModel"><span class="hs-identifier">DefModel</span></a></a><span>     </span><a href="ModelDef.html#ModelDef"><span class="hs-identifier hs-type">ModelDef</span></a><span>
+</span><a name="line-35"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefPurp"><a href="TxsDef.html#DefPurp"><span class="hs-identifier">DefPurp</span></a></a><span>      </span><a href="PurpDef.html#PurpDef"><span class="hs-identifier hs-type">PurpDef</span></a><span>
+</span><a name="line-36"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefMapper"><a href="TxsDef.html#DefMapper"><span class="hs-identifier">DefMapper</span></a></a><span>    </span><a href="MapperDef.html#MapperDef"><span class="hs-identifier hs-type">MapperDef</span></a><span>
+</span><a name="line-37"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefCnect"><a href="TxsDef.html#DefCnect"><span class="hs-identifier">DefCnect</span></a></a><span>     </span><a href="CnectDef.html#CnectDef"><span class="hs-identifier hs-type">CnectDef</span></a><span>
+</span><a name="line-38"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefChan"><a href="TxsDef.html#DefChan"><span class="hs-identifier">DefChan</span></a></a><span>
+</span><a name="line-39"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefVar"><a href="TxsDef.html#DefVar"><span class="hs-identifier">DefVar</span></a></a><span>
+</span><a name="line-40"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefStat"><a href="TxsDef.html#DefStat"><span class="hs-identifier">DefStat</span></a></a><span>
+</span><a name="line-41"></a><span>                     </span><span class="hs-glyph">|</span><span> </span><a name="DefGoal"><a href="TxsDef.html#DefGoal"><span class="hs-identifier">DefGoal</span></a></a><span>
+</span><a name="line-42"></a><span>     </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Ord</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Read</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Show</span><span class="hs-special">)</span><span>
+</span><a name="line-43"></a><span>
+</span><a name="line-44"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-45"></a><span class="hs-comment">--</span><span>
+</span><a name="line-46"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-47"></a></pre></body></html>

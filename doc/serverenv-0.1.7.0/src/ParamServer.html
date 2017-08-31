@@ -1,0 +1,58 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-
+TorXakis - Model Based Testing
+Copyright (c) 2015-2017 TNO and Radboud University
+See LICENSE at root directory of this repository.
+-}</span><span>
+</span><a name="line-6"></a><span>
+</span><a name="line-7"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-8"></a><span>
+</span><a name="line-9"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">ParamServer</span><span>
+</span><a name="line-10"></a><span>
+</span><a name="line-11"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-12"></a><span class="hs-comment">-- </span><span>
+</span><a name="line-13"></a><span class="hs-comment">-- TorXakis Server Parameters</span><span>
+</span><a name="line-14"></a><span class="hs-comment">-- </span><span>
+</span><a name="line-15"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-16"></a><span class="hs-comment">-- export</span><span>
+</span><a name="line-17"></a><span>
+</span><a name="line-18"></a><span class="hs-special">(</span><span> </span><a href="ParamServer.html#Params"><span class="hs-identifier hs-type">Params</span></a><span>           </span><span class="hs-comment">-- Params = Map.Map String (String,String-&gt;Bool)</span><span>
+</span><a name="line-19"></a><span class="hs-special">,</span><span> </span><a href="ParamServer.html#initParams"><span class="hs-identifier hs-var">initParams</span></a><span>       </span><span class="hs-comment">-- initPrarams :: Map.Map String (String,String-&gt;Bool)</span><span>
+</span><a name="line-20"></a><span>                   </span><span class="hs-comment">-- initial values of parameters</span><span>
+</span><a name="line-21"></a><span class="hs-special">)</span><span>
+</span><a name="line-22"></a><span>
+</span><a name="line-23"></a><span class="hs-keyword">where</span><span>
+</span><a name="line-24"></a><span>
+</span><a name="line-25"></a><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-identifier">Data</span><span class="hs-operator">.</span><span class="hs-identifier">Char</span><span> </span><span class="hs-keyword">as</span><span> </span><span class="hs-identifier">Char</span><span>
+</span><a name="line-26"></a><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-identifier">Data</span><span class="hs-operator">.</span><span class="hs-identifier">Map</span><span>  </span><span class="hs-keyword">as</span><span> </span><span class="hs-identifier">Map</span><span>
+</span><a name="line-27"></a><span>
+</span><a name="line-28"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-29"></a><span class="hs-comment">-- initParams</span><span>
+</span><a name="line-30"></a><span>
+</span><a name="line-31"></a><span class="hs-keyword">type</span><span>  </span><a name="Params"><a href="ParamServer.html#Params"><span class="hs-identifier">Params</span></a></a><span>  </span><span class="hs-glyph">=</span><span>  </span><span class="hs-identifier hs-type">Map</span><span class="hs-operator hs-type">.</span><span class="hs-identifier hs-type">Map</span><span> </span><span class="hs-identifier hs-type">String</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span class="hs-identifier hs-type">String</span><span class="hs-glyph">-&gt;</span><span class="hs-identifier hs-type">Bool</span><span class="hs-special">)</span><span>
+</span><a name="line-32"></a><span>
+</span><a name="line-33"></a><span class="hs-identifier">initParams</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="ParamServer.html#Params"><span class="hs-identifier hs-type">Params</span></a><span>
+</span><a name="line-34"></a><a name="initParams"><a href="ParamServer.html#initParams"><span class="hs-identifier">initParams</span></a></a><span>  </span><span class="hs-glyph">=</span><span>  </span><span class="hs-identifier hs-var">Map</span><span class="hs-operator hs-var">.</span><span class="hs-identifier hs-var">fromList</span><span> </span><span class="hs-operator hs-var">$</span><span> </span><span class="hs-identifier hs-var">map</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-glyph">\</span><span class="hs-special">(</span><a name="local-6989586621679027331"><a href="#local-6989586621679027331"><span class="hs-identifier">x</span></a></a><span class="hs-special">,</span><a name="local-6989586621679027332"><a href="#local-6989586621679027332"><span class="hs-identifier">y</span></a></a><span class="hs-special">,</span><a name="local-6989586621679027333"><a href="#local-6989586621679027333"><span class="hs-identifier">z</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679027331"><span class="hs-identifier hs-var">x</span></a><span class="hs-special">,</span><span class="hs-special">(</span><a href="#local-6989586621679027332"><span class="hs-identifier hs-var">y</span></a><span class="hs-special">,</span><a href="#local-6989586621679027333"><span class="hs-identifier hs-var">z</span></a><span class="hs-special">)</span><span class="hs-special">)</span><span> </span><span class="hs-special">)</span><span>
+</span><a name="line-35"></a><span>
+</span><a name="line-36"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-37"></a><span class="hs-comment">-- sut observations</span><span>
+</span><a name="line-38"></a><span>  </span><span>
+</span><a name="line-39"></a><span>  </span><span class="hs-special">[</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-string">&quot;param_Sut_deltaTime&quot;</span><span>      </span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;2000&quot;</span><span>      </span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-var">all</span><span> </span><span class="hs-identifier hs-var">Char</span><span class="hs-operator hs-var">.</span><span class="hs-identifier hs-var">isDigit</span><span class="hs-special">)</span><span>
+</span><a name="line-40"></a><span>            </span><span class="hs-comment">-- param_Sut_deltaTime :: Int (&gt;0)</span><span>
+</span><a name="line-41"></a><span>            </span><span class="hs-comment">-- quiescence output time (millisec &gt;0)</span><span>
+</span><a name="line-42"></a><span>
+</span><a name="line-43"></a><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-string">&quot;param_Sut_ioTime&quot;</span><span>         </span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;10&quot;</span><span>        </span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-var">all</span><span> </span><span class="hs-identifier hs-var">Char</span><span class="hs-operator hs-var">.</span><span class="hs-identifier hs-var">isDigit</span><span class="hs-special">)</span><span>
+</span><a name="line-44"></a><span>            </span><span class="hs-comment">-- param_Sut_ioTime :: Int (&gt;0)</span><span>
+</span><a name="line-45"></a><span>            </span><span class="hs-comment">--  timeout for input when trying output (msec, &gt;0)</span><span>
+</span><a name="line-46"></a><span>
+</span><a name="line-47"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-48"></a><span class="hs-comment">-- simulation</span><span>
+</span><a name="line-49"></a><span>
+</span><a name="line-50"></a><span>  </span><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-string">&quot;param_Sim_deltaTime&quot;</span><span>      </span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;200&quot;</span><span>       </span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-var">all</span><span> </span><span class="hs-identifier hs-var">Char</span><span class="hs-operator hs-var">.</span><span class="hs-identifier hs-var">isDigit</span><span class="hs-special">)</span><span>
+</span><a name="line-51"></a><span>            </span><span class="hs-comment">-- param_Sim_deltaTime :: Int (&gt;0)</span><span>
+</span><a name="line-52"></a><span>            </span><span class="hs-comment">-- quiescence input time (millisec &gt;0)</span><span>
+</span><a name="line-53"></a><span>  </span><span class="hs-special">]</span><span>
+</span><a name="line-54"></a><span>
+</span><a name="line-55"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-56"></a><span class="hs-comment">--                                                                                           --</span><span>
+</span><a name="line-57"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-58"></a></pre></body></html>

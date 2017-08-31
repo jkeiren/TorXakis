@@ -1,0 +1,24 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-
+TorXakis - Model Based Testing
+Copyright (c) 2015-2017 TNO and Radboud University
+See LICENSE at root directory of this repository.
+-}</span><span>
+</span><a name="line-6"></a><span>
+</span><a name="line-7"></a><span class="hs-comment">-- | This module defines the options that can be passed to TorXakis.</span><span>
+</span><a name="line-8"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Config</span><span>
+</span><a name="line-9"></a><span>  </span><span class="hs-special">(</span><span> </span><a href="Config.html#Config"><span class="hs-identifier hs-type">Config</span></a><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-10"></a><span>  </span><span class="hs-special">,</span><span> </span><a href="Config.html#SMTSolver"><span class="hs-identifier hs-type">SMTSolver</span></a><span> </span><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-11"></a><span>  </span><span class="hs-special">)</span><span>
+</span><a name="line-12"></a><span class="hs-keyword">where</span><span>
+</span><a name="line-13"></a><span>
+</span><a name="line-14"></a><span class="hs-comment">-- | SMT Solvers that can be choosen.</span><span>
+</span><a name="line-15"></a><span class="hs-keyword">data</span><span> </span><a name="SMTSolver"><a href="Config.html#SMTSolver"><span class="hs-identifier">SMTSolver</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a name="Z3"><a href="Config.html#Z3"><span class="hs-identifier">Z3</span></a></a><span> </span><span class="hs-glyph">|</span><span> </span><a name="CVC4"><a href="Config.html#CVC4"><span class="hs-identifier">CVC4</span></a></a><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Show</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Read</span><span class="hs-special">)</span><span>
+</span><a name="line-16"></a><span>
+</span><a name="line-17"></a><span class="hs-comment">-- | TorXakis configuration options.</span><span>
+</span><a name="line-18"></a><span class="hs-keyword">data</span><span> </span><a name="Config"><a href="Config.html#Config"><span class="hs-identifier">Config</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a name="Config"><a href="Config.html#Config"><span class="hs-identifier">Config</span></a></a><span>
+</span><a name="line-19"></a><span>  </span><span class="hs-special">{</span><span> </span><span class="hs-comment">-- | SMT solver</span><span>
+</span><a name="line-20"></a><span>    </span><a name="smtSolver"><a href="Config.html#smtSolver"><span class="hs-identifier">smtSolver</span></a></a><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><a href="Config.html#SMTSolver"><span class="hs-identifier hs-type">SMTSolver</span></a><span>
+</span><a name="line-21"></a><span>    </span><span class="hs-comment">-- | Log all SMT commands.</span><span>
+</span><a name="line-22"></a><span>  </span><span class="hs-special">,</span><span> </span><a name="smtLog"><a href="Config.html#smtLog"><span class="hs-identifier">smtLog</span></a></a><span>    </span><span class="hs-glyph">::</span><span> </span><span class="hs-glyph">!</span><span class="hs-identifier hs-type">Bool</span><span>
+</span><a name="line-23"></a><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Show</span><span class="hs-special">)</span><span>
+</span><a name="line-24"></a></pre></body></html>

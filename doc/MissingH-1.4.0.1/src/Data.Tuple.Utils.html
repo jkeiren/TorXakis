@@ -1,0 +1,41 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><a name="line-2"></a><span class="hs-comment">{- arch-tag: Tuple utilities main file
+Copyright (c) 2004-2011 John Goerzen &lt;jgoerzen@complete.org&gt;
+
+All rights reserved.
+
+For license and copyright information, see the file LICENSE
+-}</span><span>
+</span><a name="line-9"></a><span>
+</span><a name="line-10"></a><span class="hs-comment">{- |
+   Module     : Data.Tuple.Utils
+   Copyright  : Copyright (C) 2004-2011 John Goerzen
+   License    : BSD3
+
+   Maintainer : John Goerzen &lt;jgoerzen@complete.org&gt; 
+   Stability  : provisional
+   Portability: portable
+
+This module provides various helpful utilities for dealing with lists.
+
+Written by Neil Mitchell, &lt;http://www.cs.york.ac.uk/~ndm/&gt;
+-}</span><span>
+</span><a name="line-23"></a><span>
+</span><a name="line-24"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">Data</span><span class="hs-operator">.</span><span class="hs-identifier">Tuple</span><span class="hs-operator">.</span><span class="hs-identifier">Utils</span><span class="hs-special">(</span><span>
+</span><a name="line-25"></a><span>    </span><span class="hs-comment">-- * Extraction</span><span>
+</span><a name="line-26"></a><span>    </span><a href="Data.Tuple.Utils.html#fst3"><span class="hs-identifier hs-var">fst3</span></a><span class="hs-special">,</span><span> </span><a href="Data.Tuple.Utils.html#snd3"><span class="hs-identifier hs-var">snd3</span></a><span class="hs-special">,</span><span> </span><a href="Data.Tuple.Utils.html#thd3"><span class="hs-identifier hs-var">thd3</span></a><span>
+</span><a name="line-27"></a><span>    </span><span class="hs-special">)</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-28"></a><span>
+</span><a name="line-29"></a><span>
+</span><a name="line-30"></a><span class="hs-comment">-- | Take the first item out of a 3 element tuple</span><span>
+</span><a name="line-31"></a><span class="hs-identifier">fst3</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679074514"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">,</span><a href="#local-6989586621679074515"><span class="hs-identifier hs-type">b</span></a><span class="hs-special">,</span><a href="#local-6989586621679074516"><span class="hs-identifier hs-type">c</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679074514"><span class="hs-identifier hs-type">a</span></a><span>
+</span><a name="line-32"></a><a name="fst3"><a href="Data.Tuple.Utils.html#fst3"><span class="hs-identifier">fst3</span></a></a><span> </span><span class="hs-special">(</span><a name="local-6989586621679074517"><a href="#local-6989586621679074517"><span class="hs-identifier">a</span></a></a><span class="hs-special">,</span><a name="local-6989586621679074518"><a href="#local-6989586621679074518"><span class="hs-identifier">b</span></a></a><span class="hs-special">,</span><a name="local-6989586621679074519"><a href="#local-6989586621679074519"><span class="hs-identifier">c</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679074517"><span class="hs-identifier hs-var">a</span></a><span>
+</span><a name="line-33"></a><span>
+</span><a name="line-34"></a><span class="hs-comment">-- | Take the second item out of a 3 element tuple</span><span>
+</span><a name="line-35"></a><span class="hs-identifier">snd3</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679074511"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">,</span><a href="#local-6989586621679074512"><span class="hs-identifier hs-type">b</span></a><span class="hs-special">,</span><a href="#local-6989586621679074513"><span class="hs-identifier hs-type">c</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679074512"><span class="hs-identifier hs-type">b</span></a><span>
+</span><a name="line-36"></a><a name="snd3"><a href="Data.Tuple.Utils.html#snd3"><span class="hs-identifier">snd3</span></a></a><span> </span><span class="hs-special">(</span><a name="local-6989586621679074520"><a href="#local-6989586621679074520"><span class="hs-identifier">a</span></a></a><span class="hs-special">,</span><a name="local-6989586621679074521"><a href="#local-6989586621679074521"><span class="hs-identifier">b</span></a></a><span class="hs-special">,</span><a name="local-6989586621679074522"><a href="#local-6989586621679074522"><span class="hs-identifier">c</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679074521"><span class="hs-identifier hs-var">b</span></a><span>
+</span><a name="line-37"></a><span>
+</span><a name="line-38"></a><span class="hs-comment">-- | Take the third item out of a 3 element tuple</span><span>
+</span><a name="line-39"></a><span class="hs-identifier">thd3</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679074508"><span class="hs-identifier hs-type">a</span></a><span class="hs-special">,</span><a href="#local-6989586621679074509"><span class="hs-identifier hs-type">b</span></a><span class="hs-special">,</span><a href="#local-6989586621679074510"><span class="hs-identifier hs-type">c</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679074510"><span class="hs-identifier hs-type">c</span></a><span>
+</span><a name="line-40"></a><a name="thd3"><a href="Data.Tuple.Utils.html#thd3"><span class="hs-identifier">thd3</span></a></a><span> </span><span class="hs-special">(</span><a name="local-6989586621679074523"><a href="#local-6989586621679074523"><span class="hs-identifier">a</span></a></a><span class="hs-special">,</span><a name="local-6989586621679074524"><a href="#local-6989586621679074524"><span class="hs-identifier">b</span></a></a><span class="hs-special">,</span><a name="local-6989586621679074525"><a href="#local-6989586621679074525"><span class="hs-identifier">c</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679074525"><span class="hs-identifier hs-var">c</span></a><span>
+</span><a name="line-41"></a></pre></body></html>

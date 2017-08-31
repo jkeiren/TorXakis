@@ -1,0 +1,38 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-
+TorXakis - Model Based Testing
+Copyright (c) 2015-2017 TNO and Radboud University
+See LICENSE at root directory of this repository.
+-}</span><span>
+</span><a name="line-6"></a><span>
+</span><a name="line-7"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-8"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SMT</span><span>
+</span><a name="line-9"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-10"></a><span class="hs-comment">--</span><span>
+</span><a name="line-11"></a><span class="hs-comment">-- SMT: open a connection to SMT, send constraints, and retrieve a model</span><span>
+</span><a name="line-12"></a><span class="hs-comment">-- </span><span>
+</span><a name="line-13"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-14"></a><span class="hs-comment">-- export</span><span>
+</span><a name="line-15"></a><span>
+</span><a name="line-16"></a><span class="hs-special">(</span><span> </span><a href="SMTInternal.html#createSMTEnv"><span class="hs-identifier hs-var">createSMTEnv</span></a><span>
+</span><a name="line-17"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#openSolver"><span class="hs-identifier hs-var">openSolver</span></a><span>
+</span><a name="line-18"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#close"><span class="hs-identifier hs-var">close</span></a><span>
+</span><a name="line-19"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#addDefinitions"><span class="hs-identifier hs-var">addDefinitions</span></a><span>
+</span><a name="line-20"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#addDeclarations"><span class="hs-identifier hs-var">addDeclarations</span></a><span>
+</span><a name="line-21"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#addAssertions"><span class="hs-identifier hs-var">addAssertions</span></a><span>
+</span><a name="line-22"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#getSolvable"><span class="hs-identifier hs-var">getSolvable</span></a><span>
+</span><a name="line-23"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#getSolution"><span class="hs-identifier hs-var">getSolution</span></a><span>
+</span><a name="line-24"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#push"><span class="hs-identifier hs-var">push</span></a><span>
+</span><a name="line-25"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#pop"><span class="hs-identifier hs-var">pop</span></a><span>
+</span><a name="line-26"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#put"><span class="hs-identifier hs-var">put</span></a><span>
+</span><a name="line-27"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#valExprToString"><span class="hs-identifier hs-var">valExprToString</span></a><span>
+</span><a name="line-28"></a><span>
+</span><a name="line-29"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#cmdCVC4"><span class="hs-identifier hs-var">cmdCVC4</span></a><span>
+</span><a name="line-30"></a><span class="hs-special">,</span><span> </span><a href="SMTInternal.html#cmdZ3"><span class="hs-identifier hs-var">cmdZ3</span></a><span>
+</span><a name="line-31"></a><span class="hs-special">)</span><span>
+</span><a name="line-32"></a><span>
+</span><a name="line-33"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-34"></a><span class="hs-comment">-- import</span><span>
+</span><a name="line-35"></a><span>
+</span><a name="line-36"></a><span class="hs-keyword">where</span><span>
+</span><a name="line-37"></a><span>
+</span><a name="line-38"></a><span class="hs-keyword">import</span><span> </span><a href="SMTInternal.html"><span class="hs-identifier">SMTInternal</span></a></pre></body></html>

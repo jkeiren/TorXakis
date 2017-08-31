@@ -1,0 +1,59 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-
+TorXakis - Model Based Testing
+Copyright (c) 2015-2017 TNO and Radboud University
+See LICENSE at root directory of this repository.
+-}</span><span>
+</span><a name="line-6"></a><span>
+</span><a name="line-7"></a><span>
+</span><a name="line-8"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-9"></a><span class="hs-comment">--</span><span>
+</span><a name="line-10"></a><span class="hs-comment">--   Module SolveDefs :  Some Definitions for Solving</span><span>
+</span><a name="line-11"></a><span class="hs-comment">--</span><span>
+</span><a name="line-12"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-13"></a><span>
+</span><a name="line-14"></a><span>
+</span><a name="line-15"></a><span class="hs-pragma">{-# LANGUAGE FlexibleInstances #-}</span><span>
+</span><a name="line-16"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">SolveDefs</span><span>
+</span><a name="line-17"></a><span class="hs-special">(</span><span> </span><a href="SolveDefs.html#Solution"><span class="hs-identifier hs-type">Solution</span></a><span>
+</span><a name="line-18"></a><span class="hs-special">,</span><span> </span><a href="SolveDefs.html#SolvableProblem"><span class="hs-identifier hs-type">SolvableProblem</span></a><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-19"></a><span class="hs-special">,</span><span> </span><a href="SolveDefs.html#SolveProblem"><span class="hs-identifier hs-type">SolveProblem</span></a><span class="hs-special">(</span><span class="hs-glyph">..</span><span class="hs-special">)</span><span>
+</span><a name="line-20"></a><span class="hs-special">)</span><span>
+</span><a name="line-21"></a><span>
+</span><a name="line-22"></a><span class="hs-keyword">where</span><span>
+</span><a name="line-23"></a><span>
+</span><a name="line-24"></a><span class="hs-keyword">import</span><span> </span><span class="hs-keyword">qualified</span><span> </span><span class="hs-identifier">Data</span><span class="hs-operator">.</span><span class="hs-identifier">Map</span><span>  </span><span class="hs-keyword">as</span><span> </span><span class="hs-identifier">Map</span><span>
+</span><a name="line-25"></a><span>
+</span><a name="line-26"></a><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">TxsDefs</span><span>
+</span><a name="line-27"></a><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">TxsShow</span><span>
+</span><a name="line-28"></a><span>
+</span><a name="line-29"></a><span>
+</span><a name="line-30"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-31"></a><span class="hs-comment">-- SMT definitions</span><span>
+</span><a name="line-32"></a><span>
+</span><a name="line-33"></a><span>
+</span><a name="line-34"></a><span class="hs-keyword">type</span><span>  </span><a name="Solution"><a href="SolveDefs.html#Solution"><span class="hs-identifier">Solution</span></a></a><span> </span><a name="local-6989586621679036544"><a href="#local-6989586621679036544"><span class="hs-identifier">v</span></a></a><span>       </span><span class="hs-glyph">=</span><span>  </span><span class="hs-identifier hs-type">Map</span><span class="hs-operator hs-type">.</span><span class="hs-identifier hs-type">Map</span><span> </span><a href="#local-6989586621679036544"><span class="hs-identifier hs-type">v</span></a><span> </span><span class="hs-identifier hs-type">Const</span><span>
+</span><a name="line-35"></a><span>
+</span><a name="line-36"></a><span class="hs-keyword">data</span><span>  </span><a name="SolvableProblem"><a href="SolveDefs.html#SolvableProblem"><span class="hs-identifier">SolvableProblem</span></a></a><span>  </span><span class="hs-glyph">=</span><span> </span><a name="Sat"><a href="SolveDefs.html#Sat"><span class="hs-identifier">Sat</span></a></a><span>
+</span><a name="line-37"></a><span>                       </span><span class="hs-glyph">|</span><span> </span><a name="Unsat"><a href="SolveDefs.html#Unsat"><span class="hs-identifier">Unsat</span></a></a><span>
+</span><a name="line-38"></a><span>                       </span><span class="hs-glyph">|</span><span> </span><a name="Unknown"><a href="SolveDefs.html#Unknown"><span class="hs-identifier">Unknown</span></a></a><span>
+</span><a name="line-39"></a><span>     </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Ord</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Read</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Show</span><span class="hs-special">)</span><span>
+</span><a name="line-40"></a><span>
+</span><a name="line-41"></a><span class="hs-keyword">data</span><span>  </span><a name="SolveProblem"><a href="SolveDefs.html#SolveProblem"><span class="hs-identifier">SolveProblem</span></a></a><span> </span><a name="local-6989586621679036543"><a href="#local-6989586621679036543"><span class="hs-identifier">v</span></a></a><span>  </span><span class="hs-glyph">=</span><span> </span><a name="Solved"><a href="SolveDefs.html#Solved"><span class="hs-identifier">Solved</span></a></a><span> </span><span class="hs-special">(</span><a href="SolveDefs.html#Solution"><span class="hs-identifier hs-type">Solution</span></a><span> </span><a href="#local-6989586621679036543"><span class="hs-identifier hs-type">v</span></a><span class="hs-special">)</span><span>
+</span><a name="line-42"></a><span>                      </span><span class="hs-glyph">|</span><span> </span><a name="Unsolvable"><a href="SolveDefs.html#Unsolvable"><span class="hs-identifier">Unsolvable</span></a></a><span>
+</span><a name="line-43"></a><span>                      </span><span class="hs-glyph">|</span><span> </span><a name="UnableToSolve"><a href="SolveDefs.html#UnableToSolve"><span class="hs-identifier">UnableToSolve</span></a></a><span>
+</span><a name="line-44"></a><span>     </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Ord</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Read</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Show</span><span class="hs-special">)</span><span>
+</span><a name="line-45"></a><span>
+</span><a name="line-46"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-47"></a><span>
+</span><a name="line-48"></a><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Variable</span><span> </span><a href="#local-6989586621679036611"><span class="hs-identifier hs-type">v</span></a><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">PShow</span><span> </span><a href="#local-6989586621679036611"><span class="hs-identifier hs-type">v</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-identifier hs-type">PShow</span><span> </span><span class="hs-special">(</span><a href="SolveDefs.html#Solution"><span class="hs-identifier hs-type">Solution</span></a><span> </span><a href="#local-6989586621679036611"><span class="hs-identifier hs-type">v</span></a><span class="hs-special">)</span><span>
+</span><a name="line-49"></a><span>  </span><span class="hs-keyword">where</span><span>
+</span><a name="line-50"></a><span>    </span><a name="local-8214565720323794274"><span class="hs-identifier">pshow</span></a><span> </span><a name="local-6989586621679036612"><a href="#local-6989586621679036612"><span class="hs-identifier">sol</span></a></a><span>
+</span><a name="line-51"></a><span>      </span><span class="hs-glyph">=</span><span>  </span><span class="hs-identifier hs-var">concatMap</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><span class="hs-special">(</span><a name="local-6989586621679036613"><a href="#local-6989586621679036613"><span class="hs-identifier">v</span></a></a><span class="hs-special">,</span><a name="local-6989586621679036614"><a href="#local-6989586621679036614"><span class="hs-identifier">w</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-var">pshow</span><span> </span><a href="#local-6989586621679036613"><span class="hs-identifier hs-var">v</span></a><span> </span><span class="hs-operator hs-var">++</span><span> </span><span class="hs-string">&quot; = &quot;</span><span> </span><span class="hs-operator hs-var">++</span><span> </span><span class="hs-identifier hs-var">pshow</span><span> </span><a href="#local-6989586621679036614"><span class="hs-identifier hs-var">w</span></a><span> </span><span class="hs-operator hs-var">++</span><span> </span><span class="hs-string">&quot;\n&quot;</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">Map</span><span class="hs-operator hs-var">.</span><span class="hs-identifier hs-var">toList</span><span> </span><a href="#local-6989586621679036612"><span class="hs-identifier hs-var">sol</span></a><span class="hs-special">)</span><span>
+</span><a name="line-52"></a><span>
+</span><a name="line-53"></a><span>
+</span><a name="line-54"></a><span class="hs-keyword">instance</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Variable</span><span> </span><a href="#local-6989586621679036597"><span class="hs-identifier hs-type">v</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=&gt;</span><span> </span><span class="hs-identifier hs-type">PShow</span><span> </span><span class="hs-special">(</span><a href="SolveDefs.html#SolveProblem"><span class="hs-identifier hs-type">SolveProblem</span></a><span> </span><a href="#local-6989586621679036597"><span class="hs-identifier hs-type">v</span></a><span class="hs-special">)</span><span>
+</span><a name="line-55"></a><span>
+</span><a name="line-56"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-57"></a><span class="hs-comment">--                                                                                           --</span><span>
+</span><a name="line-58"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-59"></a></pre></body></html>

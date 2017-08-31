@@ -1,0 +1,426 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-pragma">{-# LANGUAGE Safe #-}</span><span>
+</span><a name="line-2"></a><span class="hs-comment">{- |
+   Module     : System.Path.NameManip
+   Copyright  : Copyright (C) 2004 Volker Wysk
+   License    : BSD3
+
+   Maintainer : John Goerzen &lt;jgoerzen@complete.org&gt;
+   Stability  : provisional
+   Portability: portable
+
+Low-level path name manipulations.
+
+Written by Volker Wysk
+-}</span><span>
+</span><a name="line-15"></a><span>
+</span><a name="line-16"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">System</span><span class="hs-operator">.</span><span class="hs-identifier">Path</span><span class="hs-operator">.</span><span class="hs-identifier">NameManip</span><span> </span><span class="hs-keyword">where</span><span>
+</span><a name="line-17"></a><span>
+</span><a name="line-18"></a><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">Data</span><span class="hs-operator">.</span><span class="hs-identifier">List</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">intercalate</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-var">unfoldr</span><span class="hs-special">)</span><span>
+</span><a name="line-19"></a><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">System</span><span class="hs-operator">.</span><span class="hs-identifier">Directory</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">getCurrentDirectory</span><span class="hs-special">)</span><span>
+</span><a name="line-20"></a><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">System</span><span class="hs-operator">.</span><span class="hs-identifier">FilePath</span><span> </span><span class="hs-special">(</span><span class="hs-special">(</span><span class="hs-operator hs-var">&lt;/&gt;</span><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-var">pathSeparator</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-var">isPathSeparator</span><span class="hs-special">)</span><span>
+</span><a name="line-21"></a><span>
+</span><a name="line-22"></a><span class="hs-comment">{- | Split a path in components. Repeated \&quot;@\/@\&quot; characters don\'t lead to empty
+components. \&quot;@.@\&quot; path components are removed. If the path is absolute, the first component
+will start with \&quot;@\/@\&quot;. \&quot;@..@\&quot; components are left intact. They can't be simply
+removed, because the preceding component might be a symlink. In this case,
+'realpath' is probably what you need.
+
+The case that the path is empty, is probably an error. However, it is
+treated like \&quot;@.@\&quot;, yielding an empty path components list.
+
+Examples:
+
+&gt;slice_path &quot;/&quot;        = [&quot;/&quot;]
+&gt;slice_path &quot;/foo/bar&quot; = [&quot;/foo&quot;,&quot;bar&quot;]
+&gt;slice_path &quot;..//./&quot;   = [&quot;..&quot;]
+&gt;slice_path &quot;.&quot;        = []
+
+See 'unslice_path', 'realpath', 'realpath_s'.
+-}</span><span>
+</span><a name="line-40"></a><span class="hs-identifier">slice_path</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>    </span><span class="hs-comment">-- ^ The path to be broken to components.</span><span>
+</span><a name="line-41"></a><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">String</span><span class="hs-special">]</span><span>  </span><span class="hs-comment">-- ^ List of path components.</span><span>
+</span><a name="line-42"></a><a name="slice_path"><a href="System.Path.NameManip.html#slice_path"><span class="hs-identifier">slice_path</span></a></a><span> </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a name="line-43"></a><span class="hs-identifier">slice_path</span><span> </span><span class="hs-special">(</span><a name="local-6989586621679041934"><a href="#local-6989586621679041934"><span class="hs-identifier">c</span></a></a><span class="hs-glyph">:</span><a name="local-6989586621679041935"><a href="#local-6989586621679041935"><span class="hs-identifier">cs</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="hs-identifier hs-var">isPathSeparator</span><span> </span><a href="#local-6989586621679041934"><span class="hs-identifier hs-var">c</span></a><span>
+</span><a name="line-44"></a><span>                       </span><span class="hs-keyword">then</span><span> </span><span class="hs-keyword">case</span><span> </span><a href="#local-6989586621679041936"><span class="hs-identifier hs-var">slice_path'</span></a><span> </span><a href="#local-6989586621679041935"><span class="hs-identifier hs-var">cs</span></a><span> </span><span class="hs-keyword">of</span><span>
+</span><a name="line-45"></a><span>                           </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-special">[</span><a href="#local-6989586621679041934"><span class="hs-identifier hs-var">c</span></a><span class="hs-special">]</span><span class="hs-special">]</span><span>
+</span><a name="line-46"></a><span>                           </span><span class="hs-special">(</span><a name="local-6989586621679042194"><a href="#local-6989586621679042194"><span class="hs-identifier">p</span></a></a><span class="hs-glyph">:</span><a name="local-6989586621679042195"><a href="#local-6989586621679042195"><span class="hs-identifier">ps</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679041934"><span class="hs-identifier hs-var">c</span></a><span class="hs-glyph">:</span><a href="#local-6989586621679042194"><span class="hs-identifier hs-var">p</span></a><span class="hs-special">)</span><span class="hs-glyph">:</span><a href="#local-6989586621679042195"><span class="hs-identifier hs-var">ps</span></a><span>
+</span><a name="line-47"></a><span>                       </span><span class="hs-keyword">else</span><span> </span><a href="#local-6989586621679041936"><span class="hs-identifier hs-var">slice_path'</span></a><span> </span><span class="hs-special">(</span><a href="#local-6989586621679041934"><span class="hs-identifier hs-var">c</span></a><span class="hs-glyph">:</span><a href="#local-6989586621679041935"><span class="hs-identifier hs-var">cs</span></a><span class="hs-special">)</span><span>
+</span><a name="line-48"></a><span>    </span><span class="hs-keyword">where</span><span>
+</span><a name="line-49"></a><span>      </span><a name="local-6989586621679041936"><a href="#local-6989586621679041936"><span class="hs-identifier">slice_path'</span></a></a><span> </span><a name="local-6989586621679041938"><a href="#local-6989586621679041938"><span class="hs-identifier">o</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">filter</span><span> </span><span class="hs-special">(</span><span class="hs-glyph">\</span><a name="local-6989586621679041939"><a href="#local-6989586621679041939"><span class="hs-identifier">c</span></a></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679041939"><span class="hs-identifier hs-var">c</span></a><span> </span><span class="hs-operator hs-var">/=</span><span> </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-operator hs-var">&amp;&amp;</span><span> </span><a href="#local-6989586621679041939"><span class="hs-identifier hs-var">c</span></a><span> </span><span class="hs-operator hs-var">/=</span><span> </span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">)</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679041937"><span class="hs-identifier hs-var">split</span></a><span> </span><a href="#local-6989586621679041938"><span class="hs-identifier hs-var">o</span></a><span class="hs-special">)</span><span>
+</span><a name="line-50"></a><span>
+</span><a name="line-51"></a><span>      </span><a name="local-6989586621679041937"><a href="#local-6989586621679041937"><span class="hs-identifier">split</span></a></a><span> </span><a name="local-6989586621679041940"><a href="#local-6989586621679041940"><span class="hs-identifier">xs</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">unfoldr</span><span> </span><a href="#local-6989586621679041941"><span class="hs-identifier hs-var">f</span></a><span> </span><a href="#local-6989586621679041940"><span class="hs-identifier hs-var">xs</span></a><span>
+</span><a name="line-52"></a><span>        </span><span class="hs-keyword">where</span><span>
+</span><a name="line-53"></a><span>          </span><a name="local-6989586621679041941"><a href="#local-6989586621679041941"><span class="hs-identifier">f</span></a></a><span> </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">Nothing</span><span>
+</span><a name="line-54"></a><span>          </span><span class="hs-identifier">f</span><span> </span><a name="local-6989586621679041943"><a href="#local-6989586621679041943"><span class="hs-identifier">xs</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">Just</span><span> </span><span class="hs-operator hs-var">$</span><span> </span><span class="hs-identifier hs-var">fmap</span><span> </span><a href="#local-6989586621679041942"><span class="hs-identifier hs-var">tail'</span></a><span> </span><span class="hs-operator hs-var">$</span><span> </span><span class="hs-identifier hs-var">break</span><span> </span><span class="hs-identifier hs-var">isPathSeparator</span><span> </span><a href="#local-6989586621679041943"><span class="hs-identifier hs-var">xs</span></a><span>
+</span><a name="line-55"></a><span>          </span><a name="local-6989586621679041942"><a href="#local-6989586621679041942"><span class="hs-identifier">tail'</span></a></a><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a name="line-56"></a><span>          </span><span class="hs-identifier">tail'</span><span> </span><a name="local-6989586621679042061"><a href="#local-6989586621679042061"><span class="hs-identifier">xs</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">tail</span><span> </span><a href="#local-6989586621679042061"><span class="hs-identifier hs-var">xs</span></a><span>
+</span><a name="line-57"></a><span>
+</span><a name="line-58"></a><span>
+</span><a name="line-59"></a><span class="hs-comment">{- | Form a path from path components. This isn't the inverse
+of 'slice_path', since @'unslice_path' . 'slice_path'@
+normalises the path.
+
+See 'slice_path'.
+-}</span><span>
+</span><a name="line-65"></a><span class="hs-identifier">unslice_path</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">String</span><span class="hs-special">]</span><span>        </span><span class="hs-comment">-- ^ List of path components</span><span>
+</span><a name="line-66"></a><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>          </span><span class="hs-comment">-- ^ The path which consists of the supplied path components</span><span>
+</span><a name="line-67"></a><a name="unslice_path"><a href="System.Path.NameManip.html#unslice_path"><span class="hs-identifier">unslice_path</span></a></a><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-string">&quot;.&quot;</span><span>
+</span><a name="line-68"></a><span class="hs-identifier">unslice_path</span><span> </span><a name="local-6989586621679042196"><a href="#local-6989586621679042196"><span class="hs-identifier">cs</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">intercalate</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-var">pathSeparator</span><span class="hs-special">]</span><span> </span><a href="#local-6989586621679042196"><span class="hs-identifier hs-var">cs</span></a><span>
+</span><a name="line-69"></a><span>
+</span><a name="line-70"></a><span>
+</span><a name="line-71"></a><span class="hs-comment">{- | Normalise a path. This is done by reducing repeated @\/@ characters to one, and removing
+@.@ path components. @..@ path components are left intact, because of possible symlinks.
+
+@'normalise_path' = 'unslice_path' . 'slice_path'@
+-}</span><span>
+</span><a name="line-76"></a><span class="hs-identifier">normalise_path</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ Path to be normalised</span><span>
+</span><a name="line-77"></a><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ Path in normalised form</span><span>
+</span><a name="line-78"></a><a name="normalise_path"><a href="System.Path.NameManip.html#normalise_path"><span class="hs-identifier">normalise_path</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="System.Path.NameManip.html#unslice_path"><span class="hs-identifier hs-var">unslice_path</span></a><span> </span><span class="hs-operator hs-var">.</span><span> </span><a href="System.Path.NameManip.html#slice_path"><span class="hs-identifier hs-var">slice_path</span></a><span>
+</span><a name="line-79"></a><span>
+</span><a name="line-80"></a><span>
+</span><a name="line-81"></a><span class="hs-comment">{- | Split a file name in components. This are the base file name and the
+suffixes, which are separated by dots. If the name starts with a dot, it is
+regarded as part of the base name. The result is a list of file name
+components. The filename may be a path. In this case, everything up to the
+last path component will be returned as part of the base file name. The
+path gets normalised thereby.
+
+No empty suffixes are returned. If the file name contains several
+consecutive dots, they are regared as part of the preceding file name
+component.
+
+Concateneting the name components and adding dots, reproduces the
+original name, with a normalised path:
+@concat . intersperse \&quot;.\&quot; . 'slice_filename' == 'normalise'@.
+
+Note that the last path component might be \&quot;@..@\&quot;. Then it is not
+possible to deduce the refered directory's name from the path. An IO
+action for getting the real path is then necessary.
+
+Examples:
+
+@
+'slice_filename' \&quot;a.b\/\/.\/.foo.tar.gz\&quot; == [\&quot;a.b\/.foo\&quot;,\&quot;tar\&quot;,\&quot;gz\&quot;]
+'slice_filename' \&quot;.x..y.\&quot;             == [\&quot;.x.\&quot;, \&quot;y.\&quot;]
+@
+
+See 'unslice_filename', @slice_filename\'@.
+-}</span><span>
+</span><a name="line-109"></a><span class="hs-identifier">slice_filename</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ Path</span><span>
+</span><a name="line-110"></a><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">String</span><span class="hs-special">]</span><span>      </span><span class="hs-comment">-- ^ List of components the file name is made up of</span><span>
+</span><a name="line-111"></a><a name="slice_filename"><a href="System.Path.NameManip.html#slice_filename"><span class="hs-identifier">slice_filename</span></a></a><span> </span><a name="local-6989586621679042197"><a href="#local-6989586621679042197"><span class="hs-identifier">path</span></a></a><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-112"></a><span>   </span><span class="hs-keyword">let</span><span> </span><a name="local-6989586621679042198"><a href="#local-6989586621679042198"><span class="hs-identifier">comps</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="System.Path.NameManip.html#slice_path"><span class="hs-identifier hs-var">slice_path</span></a><span> </span><a href="#local-6989586621679042197"><span class="hs-identifier hs-var">path</span></a><span>
+</span><a name="line-113"></a><span>   </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">if</span><span> </span><a href="#local-6989586621679042198"><span class="hs-identifier hs-var">comps</span></a><span> </span><span class="hs-operator hs-var">==</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a name="line-114"></a><span>         </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a name="line-115"></a><span>         </span><span class="hs-keyword">else</span><span> </span><span class="hs-comment">-- slice_filename' result not empty, because comps not empty</span><span>
+</span><a name="line-116"></a><span>              </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><a name="local-6989586621679042199"><a href="#local-6989586621679042199"><span class="hs-identifier">base</span></a></a><span class="hs-glyph">:</span><a name="local-6989586621679042200"><a href="#local-6989586621679042200"><span class="hs-identifier">suffixes</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="System.Path.NameManip.html#slice_filename%27"><span class="hs-identifier hs-var">slice_filename'</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">last</span><span> </span><a href="#local-6989586621679042198"><span class="hs-identifier hs-var">comps</span></a><span class="hs-special">)</span><span>
+</span><a name="line-117"></a><span>              </span><span class="hs-keyword">in</span><span> </span><span class="hs-special">(</span><a href="System.Path.NameManip.html#unslice_path"><span class="hs-identifier hs-var">unslice_path</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">init</span><span> </span><a href="#local-6989586621679042198"><span class="hs-identifier hs-var">comps</span></a><span> </span><span class="hs-operator hs-var">++</span><span> </span><span class="hs-special">[</span><a href="#local-6989586621679042199"><span class="hs-identifier hs-var">base</span></a><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">:</span><span> </span><a href="#local-6989586621679042200"><span class="hs-identifier hs-var">suffixes</span></a><span class="hs-special">)</span><span>
+</span><a name="line-118"></a><span>
+</span><a name="line-119"></a><span>
+</span><a name="line-120"></a><span class="hs-comment">{- | This is a variant of 'slice_filename'. It is like 'slice_filename', except for
+being more efficient, and the filename must not contain any preceding path,
+since this case isn't considered.
+
+See 'slice_filename', 'unslice_filename'.
+-}</span><span>
+</span><a name="line-126"></a><span class="hs-identifier">slice_filename'</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ File name without path</span><span>
+</span><a name="line-127"></a><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">String</span><span class="hs-special">]</span><span>      </span><span class="hs-comment">-- ^ List of components the file name is made up of</span><span>
+</span><a name="line-128"></a><a name="slice_filename%27"><a href="System.Path.NameManip.html#slice_filename%27"><span class="hs-identifier">slice_filename'</span></a></a><span> </span><a name="local-6989586621679042201"><a href="#local-6989586621679042201"><span class="hs-identifier">filename</span></a></a><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-129"></a><span>   </span><span class="hs-keyword">case</span><span> </span><a href="#local-6989586621679042201"><span class="hs-identifier hs-var">filename</span></a><span> </span><span class="hs-keyword">of</span><span>
+</span><a name="line-130"></a><span>     </span><span class="hs-special">(</span><span class="hs-char">'.'</span><span class="hs-glyph">:</span><a name="local-6989586621679042213"><a href="#local-6989586621679042213"><span class="hs-identifier">filename'</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">case</span><span> </span><a href="#local-6989586621679042202"><span class="hs-identifier hs-var">slice_filename''</span></a><span> </span><a href="#local-6989586621679042213"><span class="hs-identifier hs-var">filename'</span></a><span> </span><span class="hs-keyword">of</span><span>
+</span><a name="line-131"></a><span>                           </span><span class="hs-special">[</span><span class="hs-special">]</span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">]</span><span>
+</span><a name="line-132"></a><span>                           </span><span class="hs-special">(</span><a name="local-6989586621679042214"><a href="#local-6989586621679042214"><span class="hs-identifier">t</span></a></a><span class="hs-glyph">:</span><a name="local-6989586621679042215"><a href="#local-6989586621679042215"><span class="hs-identifier">ts</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-char">'.'</span><span class="hs-glyph">:</span><a href="#local-6989586621679042214"><span class="hs-identifier hs-var">t</span></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">:</span><span> </span><a href="#local-6989586621679042215"><span class="hs-identifier hs-var">ts</span></a><span>
+</span><a name="line-133"></a><span>     </span><a name="local-6989586621679042216"><a href="#local-6989586621679042216"><span class="hs-identifier">filename</span></a></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><a href="#local-6989586621679042202"><span class="hs-identifier hs-var">slice_filename''</span></a><span> </span><a href="#local-6989586621679042216"><span class="hs-identifier hs-var">filename</span></a><span>
+</span><a name="line-134"></a><span>   </span><span class="hs-keyword">where</span><span>
+</span><a name="line-135"></a><span>      </span><span class="hs-identifier">slice_filename''</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">String</span><span class="hs-special">]</span><span>
+</span><a name="line-136"></a><span>      </span><a name="local-6989586621679042202"><a href="#local-6989586621679042202"><span class="hs-identifier">slice_filename''</span></a></a><span> </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a name="line-137"></a><span>      </span><span class="hs-identifier">slice_filename''</span><span> </span><a name="local-6989586621679042204"><a href="#local-6989586621679042204"><span class="hs-identifier">fn</span></a></a><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-138"></a><span>         </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><a name="local-6989586621679042205"><a href="#local-6989586621679042205"><span class="hs-identifier">beg</span></a></a><span class="hs-special">,</span><a name="local-6989586621679042206"><a href="#local-6989586621679042206"><span class="hs-identifier">rest</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042203"><span class="hs-identifier hs-var">split1</span></a><span> </span><a href="#local-6989586621679042204"><span class="hs-identifier hs-var">fn</span></a><span>
+</span><a name="line-139"></a><span>         </span><span class="hs-keyword">in</span><span>  </span><span class="hs-special">(</span><a href="#local-6989586621679042205"><span class="hs-identifier hs-var">beg</span></a><span> </span><span class="hs-glyph">:</span><span> </span><a href="#local-6989586621679042202"><span class="hs-identifier hs-var">slice_filename''</span></a><span> </span><a href="#local-6989586621679042206"><span class="hs-identifier hs-var">rest</span></a><span class="hs-special">)</span><span>
+</span><a name="line-140"></a><span>
+</span><a name="line-141"></a><span>      </span><span class="hs-identifier">split1</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">)</span><span>
+</span><a name="line-142"></a><span>      </span><a name="local-6989586621679042203"><a href="#local-6989586621679042203"><span class="hs-identifier">split1</span></a></a><span> </span><span class="hs-special">(</span><a name="local-6989586621679042207"><a href="#local-6989586621679042207"><span class="hs-identifier">x</span></a></a><span class="hs-glyph">:</span><a name="local-6989586621679042208"><a href="#local-6989586621679042208"><span class="hs-identifier">y</span></a></a><span class="hs-glyph">:</span><a name="local-6989586621679042209"><a href="#local-6989586621679042209"><span class="hs-identifier">r</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-143"></a><span>         </span><span class="hs-keyword">if</span><span> </span><a href="#local-6989586621679042207"><span class="hs-identifier hs-var">x</span></a><span> </span><span class="hs-operator hs-var">==</span><span> </span><span class="hs-char">'.'</span><span> </span><span class="hs-operator hs-var">&amp;&amp;</span><span> </span><a href="#local-6989586621679042208"><span class="hs-identifier hs-var">y</span></a><span> </span><span class="hs-operator hs-var">/=</span><span> </span><span class="hs-char">'.'</span><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">,</span><span> </span><a href="#local-6989586621679042208"><span class="hs-identifier hs-var">y</span></a><span class="hs-glyph">:</span><a href="#local-6989586621679042209"><span class="hs-identifier hs-var">r</span></a><span class="hs-special">)</span><span>
+</span><a name="line-144"></a><span>                                 </span><span class="hs-keyword">else</span><span> </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><a name="local-6989586621679042210"><a href="#local-6989586621679042210"><span class="hs-identifier">beg</span></a></a><span class="hs-special">,</span><a name="local-6989586621679042211"><a href="#local-6989586621679042211"><span class="hs-identifier">rest</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042203"><span class="hs-identifier hs-var">split1</span></a><span> </span><span class="hs-special">(</span><a href="#local-6989586621679042208"><span class="hs-identifier hs-var">y</span></a><span class="hs-glyph">:</span><a href="#local-6989586621679042209"><span class="hs-identifier hs-var">r</span></a><span class="hs-special">)</span><span>
+</span><a name="line-145"></a><span>                                      </span><span class="hs-keyword">in</span><span>  </span><span class="hs-special">(</span><a href="#local-6989586621679042207"><span class="hs-identifier hs-var">x</span></a><span class="hs-glyph">:</span><a href="#local-6989586621679042210"><span class="hs-identifier hs-var">beg</span></a><span class="hs-special">,</span><a href="#local-6989586621679042211"><span class="hs-identifier hs-var">rest</span></a><span class="hs-special">)</span><span>
+</span><a name="line-146"></a><span>      </span><span class="hs-identifier">split1</span><span> </span><a name="local-6989586621679042212"><a href="#local-6989586621679042212"><span class="hs-identifier">str</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679042212"><span class="hs-identifier hs-var">str</span></a><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-147"></a><span>
+</span><a name="line-148"></a><span>
+</span><a name="line-149"></a><span>
+</span><a name="line-150"></a><span class="hs-comment">{- | Form file name from file name components, interspersing dots. This is
+the inverse of 'slice_filename', except for normalisation of any path.
+
+&gt; unslice_filename = concat . intersperse &quot;.&quot;
+
+See 'slice_filename'.
+-}</span><span>
+</span><a name="line-157"></a><span class="hs-identifier">unslice_filename</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">String</span><span class="hs-special">]</span><span>    </span><span class="hs-comment">-- ^ List of file name components</span><span>
+</span><a name="line-158"></a><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>      </span><span class="hs-comment">-- ^ Name of the file which consists of the supplied components</span><span>
+</span><a name="line-159"></a><a name="unslice_filename"><a href="System.Path.NameManip.html#unslice_filename"><span class="hs-identifier">unslice_filename</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">intercalate</span><span> </span><span class="hs-string">&quot;.&quot;</span><span>
+</span><a name="line-160"></a><span>
+</span><a name="line-161"></a><span>
+</span><a name="line-162"></a><span class="hs-comment">{- | Split a path in directory and file name. Only in the case that the
+supplied path is empty, both parts are empty strings. Otherwise, @\&quot;.\&quot;@ is filled in
+for the corresponding part, if necessary. Unless the path is empty,
+concatenating the returned path and file name components with a slash in
+between, makes a valid path to the file.
+
+@split_path@ splits off the last path component. This
+isn't the same as the text after the last @\/@.
+
+Note that the last path component might be @\&quot;..\&quot;@. Then it is not
+possible to deduce the refered directory's name from the path. Then an IO
+action for getting the real path is necessary.
+
+Examples:
+
+&gt;split_path &quot;/a/b/c&quot;      == (&quot;/a/b&quot;, &quot;c&quot;)
+&gt;split_path &quot;foo&quot;         == (&quot;.&quot;, &quot;foo&quot;)
+&gt;split_path &quot;foo/bar&quot;     == (&quot;foo&quot;, &quot;bar&quot;)
+&gt;split_path &quot;foo/..&quot;      == (&quot;foo&quot;, &quot;..&quot;)
+&gt;split_path &quot;.&quot;           == (&quot;.&quot;, &quot;.&quot;)
+&gt;split_path &quot;&quot;            == (&quot;&quot;, &quot;&quot;)
+&gt;split_path &quot;/foo&quot;        == (&quot;/&quot;, &quot;foo&quot;)
+&gt;split_path &quot;foo/&quot;        == (&quot;.&quot;, &quot;foo&quot;)
+&gt;split_path &quot;foo/.&quot;       == (&quot;.&quot;, &quot;foo&quot;)
+&gt;split_path &quot;foo///./bar&quot; == (&quot;foo&quot;, &quot;bar&quot;)
+
+See 'slice_path'.
+-}</span><span>
+</span><a name="line-190"></a><span class="hs-identifier">split_path</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>            </span><span class="hs-comment">-- ^ Path to be split</span><span>
+</span><a name="line-191"></a><span>           </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">)</span><span>  </span><span class="hs-comment">-- ^ Directory and file name components of the path. The directory path is normalized.</span><span>
+</span><a name="line-192"></a><a name="split_path"><a href="System.Path.NameManip.html#split_path"><span class="hs-identifier">split_path</span></a></a><span> </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">,</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-193"></a><span class="hs-identifier">split_path</span><span> </span><a name="local-6989586621679042217"><a href="#local-6989586621679042217"><span class="hs-identifier">path</span></a></a><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-194"></a><span>   </span><span class="hs-keyword">case</span><span> </span><a href="System.Path.NameManip.html#slice_path"><span class="hs-identifier hs-var">slice_path</span></a><span> </span><a href="#local-6989586621679042217"><span class="hs-identifier hs-var">path</span></a><span> </span><span class="hs-keyword">of</span><span>
+</span><a name="line-195"></a><span>      </span><span class="hs-special">[</span><span class="hs-special">]</span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-196"></a><span>      </span><span class="hs-special">[</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">]</span><span>   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-197"></a><span>      </span><span class="hs-special">[</span><a name="local-6989586621679042218"><a href="#local-6989586621679042218"><span class="hs-identifier">f</span></a></a><span class="hs-glyph">:</span><a name="local-6989586621679042219"><a href="#local-6989586621679042219"><span class="hs-identifier">fs</span></a></a><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">if</span><span> </span><span class="hs-identifier hs-var">isPathSeparator</span><span> </span><a href="#local-6989586621679042218"><span class="hs-identifier hs-var">f</span></a><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-special">(</span><span class="hs-special">[</span><span class="hs-identifier hs-var">pathSeparator</span><span class="hs-special">]</span><span class="hs-special">,</span><span> </span><a href="#local-6989586621679042219"><span class="hs-identifier hs-var">fs</span></a><span class="hs-special">)</span><span> </span><span class="hs-keyword">else</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">,</span><span> </span><a href="#local-6989586621679042218"><span class="hs-identifier hs-var">f</span></a><span class="hs-glyph">:</span><a href="#local-6989586621679042219"><span class="hs-identifier hs-var">fs</span></a><span class="hs-special">)</span><span>
+</span><a name="line-198"></a><span>      </span><a name="local-6989586621679042220"><a href="#local-6989586621679042220"><span class="hs-identifier">parts</span></a></a><span>  </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span> </span><a href="System.Path.NameManip.html#unslice_path"><span class="hs-identifier hs-var">unslice_path</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">init</span><span> </span><a href="#local-6989586621679042220"><span class="hs-identifier hs-var">parts</span></a><span class="hs-special">)</span><span>
+</span><a name="line-199"></a><span>                </span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-var">last</span><span> </span><a href="#local-6989586621679042220"><span class="hs-identifier hs-var">parts</span></a><span>
+</span><a name="line-200"></a><span>                </span><span class="hs-special">)</span><span>
+</span><a name="line-201"></a><span>
+</span><a name="line-202"></a><span class="hs-comment">{- | Get the directory part of a path.
+
+&gt;dir_part = fst . split_path
+
+See 'split_path'.
+-}</span><span>
+</span><a name="line-208"></a><span class="hs-identifier">dir_part</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>
+</span><a name="line-209"></a><a name="dir_part"><a href="System.Path.NameManip.html#dir_part"><span class="hs-identifier">dir_part</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">fst</span><span> </span><span class="hs-operator hs-var">.</span><span> </span><a href="System.Path.NameManip.html#split_path"><span class="hs-identifier hs-var">split_path</span></a><span>
+</span><a name="line-210"></a><span>
+</span><a name="line-211"></a><span>
+</span><a name="line-212"></a><span class="hs-comment">{- | Get the last path component of a path.
+
+&gt;filename_part = snd . split_path
+
+Examples:
+
+&gt;filename_part &quot;foo/bar&quot; == &quot;bar&quot;
+&gt;filename_part &quot;.&quot;       == &quot;.&quot;
+
+See 'split_path'.
+-}</span><span>
+</span><a name="line-223"></a><span class="hs-identifier">filename_part</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>
+</span><a name="line-224"></a><a name="filename_part"><a href="System.Path.NameManip.html#filename_part"><span class="hs-identifier">filename_part</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">snd</span><span> </span><span class="hs-operator hs-var">.</span><span> </span><a href="System.Path.NameManip.html#split_path"><span class="hs-identifier hs-var">split_path</span></a><span>
+</span><a name="line-225"></a><span>
+</span><a name="line-226"></a><span>
+</span><a name="line-227"></a><span class="hs-comment">{- | Inverse of 'split_path', except for normalisation.
+
+This concatenates two paths, and takes care of @\&quot;.\&quot;@ and empty paths. When the two components are the result of @split_path@, then @unsplit_path@
+creates a normalised path. It is best documented by its definition:
+
+&gt;unsplit_path (&quot;.&quot;, &quot;&quot;) = &quot;.&quot;
+&gt;unsplit_path (&quot;&quot;, &quot;.&quot;) = &quot;.&quot;
+&gt;unsplit_path (&quot;.&quot;, q)  = q
+&gt;unsplit_path (&quot;&quot;, q)   = q
+&gt;unsplit_path (p, &quot;&quot;)   = p
+&gt;unsplit_path (p, &quot;.&quot;)  = p
+&gt;unsplit_path (p, q)    = p ++ &quot;/&quot; ++ q
+
+Examples:
+
+&gt;unsplit_path (&quot;&quot;, &quot;&quot;)     == &quot;&quot;
+&gt;unsplit_path (&quot;.&quot;, &quot;&quot;)    == &quot;.&quot;
+&gt;unsplit_path (&quot;.&quot;, &quot;.&quot;)   == &quot;.&quot;
+&gt;unsplit_path (&quot;foo&quot;, &quot;.&quot;) == &quot;foo&quot;
+
+See 'split_path'.
+-}</span><span>
+</span><a name="line-249"></a><span class="hs-identifier">unsplit_path</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span> </span><span class="hs-special">)</span><span>  </span><span class="hs-comment">-- ^ Directory and file name</span><span>
+</span><a name="line-250"></a><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>          </span><span class="hs-comment">-- ^ Path formed from the directory and file name parts</span><span>
+</span><a name="line-251"></a><a name="unsplit_path"><a href="System.Path.NameManip.html#unsplit_path"><span class="hs-identifier">unsplit_path</span></a></a><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-string">&quot;.&quot;</span><span>
+</span><a name="line-252"></a><span class="hs-identifier">unsplit_path</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-string">&quot;.&quot;</span><span>
+</span><a name="line-253"></a><span class="hs-identifier">unsplit_path</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">,</span><span> </span><a name="local-6989586621679042221"><a href="#local-6989586621679042221"><span class="hs-identifier">q</span></a></a><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042221"><span class="hs-identifier hs-var">q</span></a><span>
+</span><a name="line-254"></a><span class="hs-identifier">unsplit_path</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">,</span><span> </span><a name="local-6989586621679042222"><a href="#local-6989586621679042222"><span class="hs-identifier">q</span></a></a><span class="hs-special">)</span><span>   </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042222"><span class="hs-identifier hs-var">q</span></a><span>
+</span><a name="line-255"></a><span class="hs-identifier">unsplit_path</span><span> </span><span class="hs-special">(</span><a name="local-6989586621679042223"><a href="#local-6989586621679042223"><span class="hs-identifier">p</span></a></a><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>   </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042223"><span class="hs-identifier hs-var">p</span></a><span>
+</span><a name="line-256"></a><span class="hs-identifier">unsplit_path</span><span> </span><span class="hs-special">(</span><a name="local-6989586621679042224"><a href="#local-6989586621679042224"><span class="hs-identifier">p</span></a></a><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">)</span><span>  </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042224"><span class="hs-identifier hs-var">p</span></a><span>
+</span><a name="line-257"></a><span class="hs-identifier">unsplit_path</span><span> </span><span class="hs-special">(</span><a name="local-6989586621679042225"><a href="#local-6989586621679042225"><span class="hs-identifier">p</span></a></a><span class="hs-special">,</span><span> </span><a name="local-6989586621679042226"><a href="#local-6989586621679042226"><span class="hs-identifier">q</span></a></a><span class="hs-special">)</span><span>    </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042225"><span class="hs-identifier hs-var">p</span></a><span> </span><span class="hs-operator hs-var">&lt;/&gt;</span><span> </span><a href="#local-6989586621679042226"><span class="hs-identifier hs-var">q</span></a><span>
+</span><a name="line-258"></a><span>
+</span><a name="line-259"></a><span>
+</span><a name="line-260"></a><span class="hs-comment">{- | Split a file name in prefix and suffix. If there isn't any suffix in
+the file name, then return an empty suffix. A dot at the beginning or at
+the end is not regarded as introducing a suffix.
+
+The last path component is what is being split. This isn't the same as
+splitting the string at the last dot. For instance, if the file name
+doesn't contain any dot, dots in previous path component's aren't mistaken
+as introducing suffixes.
+
+The path part is returned in normalised form. This means, @\&quot;.\&quot;@ components
+are removed, and multiple \&quot;@\/@\&quot;s are reduced to one.
+
+Note that there isn't any plausibility check performed on the suffix. If the file name doesn't have a suffix, but happens to contain a dot, then this
+dot is mistaken as introducing a suffix.
+
+Examples:
+
+&gt;split_filename &quot;path/to/foo.bar&quot;                             = (&quot;path/to/foo&quot;,&quot;bar&quot;)
+&gt;split_filename &quot;path/to/foo&quot;                                 = (&quot;path/to/foo&quot;,&quot;&quot;)
+&gt;split_filename &quot;/path.to/foo&quot;                                = (&quot;/path.to/foo&quot;,&quot;&quot;)
+&gt;split_filename &quot;a///./x&quot;                                     = (&quot;a/x&quot;,&quot;&quot;)
+&gt;split_filename &quot;dir.suffix/./&quot;                               = (&quot;dir&quot;,&quot;suffix&quot;)
+&gt;split_filename &quot;Photographie, Das 20. Jahrhundert (300 dpi)&quot; = (&quot;Photographie, Das 20&quot;, &quot; Jahrhundert (300 dpi)&quot;)
+
+See 'slice_path', 'split_filename\''
+-}</span><span>
+</span><a name="line-286"></a><span class="hs-identifier">split_filename</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>                </span><span class="hs-comment">-- ^ Path including the file name to be split</span><span>
+</span><a name="line-287"></a><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">)</span><span>      </span><span class="hs-comment">-- ^ The normalised path with the file prefix, and the file suffix.</span><span>
+</span><a name="line-288"></a><a name="split_filename"><a href="System.Path.NameManip.html#split_filename"><span class="hs-identifier">split_filename</span></a></a><span> </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-289"></a><span class="hs-identifier">split_filename</span><span> </span><a name="local-6989586621679042227"><a href="#local-6989586621679042227"><span class="hs-identifier">path</span></a></a><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-290"></a><span>   </span><span class="hs-keyword">case</span><span> </span><a href="System.Path.NameManip.html#slice_path"><span class="hs-identifier hs-var">slice_path</span></a><span> </span><a href="#local-6989586621679042227"><span class="hs-identifier hs-var">path</span></a><span> </span><span class="hs-keyword">of</span><span>
+</span><a name="line-291"></a><span>      </span><span class="hs-special">[</span><span class="hs-special">]</span><span>    </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">,</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-292"></a><span>      </span><a name="local-6989586621679042228"><a href="#local-6989586621679042228"><span class="hs-identifier">comps</span></a></a><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><a name="local-6989586621679042229"><a href="#local-6989586621679042229"><span class="hs-identifier">pref_fn</span></a></a><span class="hs-special">,</span><span> </span><a name="local-6989586621679042230"><a href="#local-6989586621679042230"><span class="hs-identifier">suff_fn</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="System.Path.NameManip.html#split_filename%27"><span class="hs-identifier hs-var">split_filename'</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">last</span><span> </span><a href="#local-6989586621679042228"><span class="hs-identifier hs-var">comps</span></a><span class="hs-special">)</span><span>
+</span><a name="line-293"></a><span>               </span><span class="hs-keyword">in</span><span> </span><span class="hs-special">(</span><span> </span><span class="hs-identifier hs-var">intercalate</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-var">pathSeparator</span><span class="hs-special">]</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">init</span><span> </span><a href="#local-6989586621679042228"><span class="hs-identifier hs-var">comps</span></a><span> </span><span class="hs-operator hs-var">++</span><span> </span><span class="hs-special">[</span><a href="#local-6989586621679042229"><span class="hs-identifier hs-var">pref_fn</span></a><span class="hs-special">]</span><span class="hs-special">)</span><span>
+</span><a name="line-294"></a><span>                  </span><span class="hs-special">,</span><span> </span><a href="#local-6989586621679042230"><span class="hs-identifier hs-var">suff_fn</span></a><span>
+</span><a name="line-295"></a><span>                  </span><span class="hs-special">)</span><span>
+</span><a name="line-296"></a><span>
+</span><a name="line-297"></a><span>
+</span><a name="line-298"></a><span class="hs-comment">{- | Variant of 'split_filename'. This is a more efficient version
+of 'split_filename', for the case that you know the string is
+is a pure file name without any slashes.
+
+See 'split_filename'.
+-}</span><span>
+</span><a name="line-304"></a><span class="hs-identifier">split_filename'</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>               </span><span class="hs-comment">-- ^ Filename to be split</span><span>
+</span><a name="line-305"></a><span>                </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">)</span><span>     </span><span class="hs-comment">-- ^ Base name and the last suffix</span><span>
+</span><a name="line-306"></a><a name="split_filename%27"><a href="System.Path.NameManip.html#split_filename%27"><span class="hs-identifier">split_filename'</span></a></a><span> </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-307"></a><span class="hs-identifier">split_filename'</span><span> </span><a name="local-6989586621679042231"><a href="#local-6989586621679042231"><span class="hs-identifier">fn</span></a></a><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-308"></a><span>   </span><span class="hs-keyword">let</span><span> </span><a name="local-6989586621679042232"><a href="#local-6989586621679042232"><span class="hs-identifier">parts</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="System.Path.NameManip.html#slice_filename%27"><span class="hs-identifier hs-var">slice_filename'</span></a><span> </span><a href="#local-6989586621679042231"><span class="hs-identifier hs-var">fn</span></a><span>
+</span><a name="line-309"></a><span>   </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">case</span><span> </span><a href="#local-6989586621679042232"><span class="hs-identifier hs-var">parts</span></a><span> </span><span class="hs-keyword">of</span><span>
+</span><a name="line-310"></a><span>         </span><span class="hs-special">[</span><span class="hs-special">]</span><span>     </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;.&quot;</span><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-311"></a><span>         </span><span class="hs-special">[</span><a name="local-6989586621679042233"><a href="#local-6989586621679042233"><span class="hs-identifier">base</span></a></a><span class="hs-special">]</span><span> </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><a href="#local-6989586621679042233"><span class="hs-identifier hs-var">base</span></a><span class="hs-special">,</span><span> </span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-312"></a><span>         </span><a name="local-6989586621679042234"><a href="#local-6989586621679042234"><span class="hs-identifier">p</span></a></a><span>      </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><a href="System.Path.NameManip.html#unslice_filename"><span class="hs-identifier hs-var">unslice_filename</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">init</span><span> </span><a href="#local-6989586621679042234"><span class="hs-identifier hs-var">p</span></a><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-var">last</span><span> </span><a href="#local-6989586621679042234"><span class="hs-identifier hs-var">p</span></a><span class="hs-special">)</span><span>
+</span><a name="line-313"></a><span>
+</span><a name="line-314"></a><span>
+</span><a name="line-315"></a><span class="hs-comment">{- | Inverse of 'split_filename'. Concatenate prefix and suffix, adding
+a dot in between, iff the suffix is not empty. The path part of the prefix is
+normalised.
+
+See 'split_filename'.
+-}</span><span>
+</span><a name="line-321"></a><span class="hs-identifier">unsplit_filename</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">)</span><span>    </span><span class="hs-comment">-- ^ File name prefix and suffix</span><span>
+</span><a name="line-322"></a><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>              </span><span class="hs-comment">-- ^ Path</span><span>
+</span><a name="line-323"></a><a name="unsplit_filename"><a href="System.Path.NameManip.html#unsplit_filename"><span class="hs-identifier">unsplit_filename</span></a></a><span> </span><span class="hs-special">(</span><a name="local-6989586621679042235"><a href="#local-6989586621679042235"><span class="hs-identifier">prefix</span></a></a><span class="hs-special">,</span><span> </span><a name="local-6989586621679042236"><a href="#local-6989586621679042236"><span class="hs-identifier">suffix</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-324"></a><span>   </span><span class="hs-keyword">if</span><span> </span><a href="#local-6989586621679042236"><span class="hs-identifier hs-var">suffix</span></a><span> </span><span class="hs-operator hs-var">==</span><span> </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-keyword">then</span><span> </span><a href="#local-6989586621679042235"><span class="hs-identifier hs-var">prefix</span></a><span> </span><span class="hs-keyword">else</span><span> </span><a href="#local-6989586621679042235"><span class="hs-identifier hs-var">prefix</span></a><span> </span><span class="hs-operator hs-var">++</span><span> </span><span class="hs-string">&quot;.&quot;</span><span> </span><span class="hs-operator hs-var">++</span><span> </span><a href="#local-6989586621679042236"><span class="hs-identifier hs-var">suffix</span></a><span>
+</span><a name="line-325"></a><span>
+</span><a name="line-326"></a><span>
+</span><a name="line-327"></a><span class="hs-comment">{- | Split a path in directory, base file name and suffix.
+-}</span><span>
+</span><a name="line-329"></a><span class="hs-identifier">split3</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>                        </span><span class="hs-comment">-- ^ Path to split</span><span>
+</span><a name="line-330"></a><span>       </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">)</span><span>      </span><span class="hs-comment">-- ^ Directory part, base file name part and suffix part</span><span>
+</span><a name="line-331"></a><a name="split3"><a href="System.Path.NameManip.html#split3"><span class="hs-identifier">split3</span></a></a><span> </span><span class="hs-string">&quot;&quot;</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">,</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">,</span><span class="hs-string">&quot;&quot;</span><span class="hs-special">)</span><span>
+</span><a name="line-332"></a><span class="hs-identifier">split3</span><span> </span><a name="local-6989586621679042237"><a href="#local-6989586621679042237"><span class="hs-identifier">path</span></a></a><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-333"></a><span>   </span><span class="hs-keyword">let</span><span> </span><a name="local-6989586621679042238"><a href="#local-6989586621679042238"><span class="hs-identifier">comps</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="System.Path.NameManip.html#slice_path"><span class="hs-identifier hs-var">slice_path</span></a><span> </span><a href="#local-6989586621679042237"><span class="hs-identifier hs-var">path</span></a><span>
+</span><a name="line-334"></a><span>       </span><span class="hs-special">(</span><a name="local-6989586621679042239"><a href="#local-6989586621679042239"><span class="hs-identifier">base</span></a></a><span class="hs-special">,</span><span> </span><a name="local-6989586621679042240"><a href="#local-6989586621679042240"><span class="hs-identifier">suffix</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="System.Path.NameManip.html#split_filename%27"><span class="hs-identifier hs-var">split_filename'</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">last</span><span> </span><a href="#local-6989586621679042238"><span class="hs-identifier hs-var">comps</span></a><span class="hs-special">)</span><span>
+</span><a name="line-335"></a><span>   </span><span class="hs-keyword">in</span><span>  </span><span class="hs-special">(</span><a href="System.Path.NameManip.html#unslice_path"><span class="hs-identifier hs-var">unslice_path</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">init</span><span> </span><a href="#local-6989586621679042238"><span class="hs-identifier hs-var">comps</span></a><span class="hs-special">)</span><span class="hs-special">,</span><span> </span><a href="#local-6989586621679042239"><span class="hs-identifier hs-var">base</span></a><span class="hs-special">,</span><span> </span><a href="#local-6989586621679042240"><span class="hs-identifier hs-var">suffix</span></a><span class="hs-special">)</span><span>
+</span><a name="line-336"></a><span>
+</span><a name="line-337"></a><span>
+</span><a name="line-338"></a><span class="hs-comment">{- |
+Form path from directory, base file name and suffix parts.
+-}</span><span>
+</span><a name="line-341"></a><span class="hs-identifier">unsplit3</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">String</span><span class="hs-special">)</span><span>    </span><span class="hs-comment">-- ^ Directory part, base file name part and suffix part</span><span>
+</span><a name="line-342"></a><span>         </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>                      </span><span class="hs-comment">-- ^ Path consisting of dir, base and suffix</span><span>
+</span><a name="line-343"></a><a name="unsplit3"><a href="System.Path.NameManip.html#unsplit3"><span class="hs-identifier">unsplit3</span></a></a><span> </span><span class="hs-special">(</span><a name="local-6989586621679042241"><a href="#local-6989586621679042241"><span class="hs-identifier">dir</span></a></a><span class="hs-special">,</span><span> </span><a name="local-6989586621679042242"><a href="#local-6989586621679042242"><span class="hs-identifier">base</span></a></a><span class="hs-special">,</span><span> </span><a name="local-6989586621679042243"><a href="#local-6989586621679042243"><span class="hs-identifier">suffix</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-344"></a><span>   </span><a href="System.Path.NameManip.html#unsplit_path"><span class="hs-identifier hs-var">unsplit_path</span></a><span> </span><span class="hs-special">(</span><a href="#local-6989586621679042241"><span class="hs-identifier hs-var">dir</span></a><span class="hs-special">,</span><span> </span><span class="hs-special">(</span><a href="System.Path.NameManip.html#unsplit_filename"><span class="hs-identifier hs-var">unsplit_filename</span></a><span> </span><span class="hs-special">(</span><a href="#local-6989586621679042242"><span class="hs-identifier hs-var">base</span></a><span class="hs-special">,</span><a href="#local-6989586621679042243"><span class="hs-identifier hs-var">suffix</span></a><span class="hs-special">)</span><span class="hs-special">)</span><span class="hs-special">)</span><span>
+</span><a name="line-345"></a><span>
+</span><a name="line-346"></a><span>
+</span><a name="line-347"></a><span class="hs-comment">{- | Test a path for a specific suffix and split it off.
+
+If the path ends with the suffix, then the result is @Just
+prefix@, where @prefix@ is the normalised path
+without the suffix. Otherwise it's @Nothing@.
+-}</span><span>
+</span><a name="line-353"></a><span class="hs-identifier">test_suffix</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>           </span><span class="hs-comment">-- ^ Suffix to split off</span><span>
+</span><a name="line-354"></a><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>           </span><span class="hs-comment">-- ^ Path to test</span><span>
+</span><a name="line-355"></a><span>            </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">Maybe</span><span> </span><span class="hs-identifier hs-type">String</span><span>     </span><span class="hs-comment">-- ^ Prefix without the suffix or @Nothing@</span><span>
+</span><a name="line-356"></a><a name="test_suffix"><a href="System.Path.NameManip.html#test_suffix"><span class="hs-identifier">test_suffix</span></a></a><span> </span><a name="local-6989586621679042244"><a href="#local-6989586621679042244"><span class="hs-identifier">suffix</span></a></a><span> </span><a name="local-6989586621679042245"><a href="#local-6989586621679042245"><span class="hs-identifier">path</span></a></a><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-357"></a><span>    </span><span class="hs-keyword">let</span><span> </span><span class="hs-special">(</span><a name="local-6989586621679042246"><a href="#local-6989586621679042246"><span class="hs-identifier">prefix</span></a></a><span class="hs-special">,</span><span> </span><a name="local-6989586621679042247"><a href="#local-6989586621679042247"><span class="hs-identifier">suff</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="System.Path.NameManip.html#split_filename"><span class="hs-identifier hs-var">split_filename</span></a><span> </span><a href="#local-6989586621679042245"><span class="hs-identifier hs-var">path</span></a><span>
+</span><a name="line-358"></a><span>    </span><span class="hs-keyword">in</span><span> </span><span class="hs-keyword">if</span><span> </span><a href="#local-6989586621679042247"><span class="hs-identifier hs-var">suff</span></a><span> </span><span class="hs-operator hs-var">==</span><span> </span><a href="#local-6989586621679042244"><span class="hs-identifier hs-var">suffix</span></a><span> </span><span class="hs-keyword">then</span><span> </span><span class="hs-identifier hs-var">Just</span><span> </span><a href="#local-6989586621679042246"><span class="hs-identifier hs-var">prefix</span></a><span>
+</span><a name="line-359"></a><span>                         </span><span class="hs-keyword">else</span><span> </span><span class="hs-identifier hs-var">Nothing</span><span>
+</span><a name="line-360"></a><span>
+</span><a name="line-361"></a><span>
+</span><a name="line-362"></a><span class="hs-comment">{- | Make a path absolute, using the current working directory.
+
+This makes a relative path absolute with respect to the current
+working directory. An absolute path is returned unmodified.
+
+The current working directory is determined with @getCurrentDirectory@
+which means that symbolic links in it are expanded and the path is
+normalised. This is different from @pwd@.
+-}</span><span>
+</span><a name="line-371"></a><span class="hs-identifier">absolute_path</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>         </span><span class="hs-comment">-- ^ The path to be made absolute</span><span>
+</span><a name="line-372"></a><span>              </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">IO</span><span> </span><span class="hs-identifier hs-type">String</span><span>      </span><span class="hs-comment">-- ^ Absulte path</span><span>
+</span><a name="line-373"></a><a name="absolute_path"><a href="System.Path.NameManip.html#absolute_path"><span class="hs-identifier">absolute_path</span></a></a><span> </span><a name="local-6989586621679042248"><a href="#local-6989586621679042248"><span class="hs-identifier">path</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">fmap</span><span> </span><span class="hs-special">(</span><a href="System.Path.NameManip.html#absolute_path%27"><span class="hs-identifier hs-var">absolute_path'</span></a><span> </span><a href="#local-6989586621679042248"><span class="hs-identifier hs-var">path</span></a><span class="hs-special">)</span><span> </span><span class="hs-identifier hs-var">getCurrentDirectory</span><span>
+</span><a name="line-374"></a><span>
+</span><a name="line-375"></a><span>
+</span><a name="line-376"></a><span class="hs-comment">{- | Make a path absolute.
+
+This makes a relative path absolute with respect to a specified
+directory. An absolute path is returned unmodified.
+-}</span><span>
+</span><a name="line-381"></a><span class="hs-identifier">absolute_path_by</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ The directory relative to which the path is made absolute</span><span>
+</span><a name="line-382"></a><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ The path to be made absolute</span><span>
+</span><a name="line-383"></a><span>                 </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ Absolute path</span><span>
+</span><a name="line-384"></a><a name="absolute_path_by"><a href="System.Path.NameManip.html#absolute_path_by"><span class="hs-identifier">absolute_path_by</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">(</span><span class="hs-operator hs-var">&lt;/&gt;</span><span class="hs-special">)</span><span>
+</span><a name="line-385"></a><span>
+</span><a name="line-386"></a><span>
+</span><a name="line-387"></a><span class="hs-comment">{- | Make a path absolute.
+
+This makes a relative path absolute with respect to a specified
+directory. An absolute path is returned unmodified.
+
+The order of the arguments can be confusing. You should rather use 'absolute_path_by'. @absolute_path\'@ is included for backwards compatibility.
+-}</span><span>
+</span><a name="line-394"></a><span class="hs-identifier">absolute_path'</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ The path to be made absolute</span><span>
+</span><a name="line-395"></a><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ The directory relative to which the path is made absolute</span><span>
+</span><a name="line-396"></a><span>               </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">String</span><span>        </span><span class="hs-comment">-- ^ Absolute path</span><span>
+</span><a name="line-397"></a><a name="absolute_path%27"><a href="System.Path.NameManip.html#absolute_path%27"><span class="hs-identifier">absolute_path'</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">flip</span><span> </span><a href="System.Path.NameManip.html#absolute_path_by"><span class="hs-identifier hs-var">absolute_path_by</span></a><span>
+</span><a name="line-398"></a><span>
+</span><a name="line-399"></a><span>
+</span><a name="line-400"></a><span class="hs-comment">{- | Guess the @\&quot;..\&quot;@-component free form of a path, specified as a list of path components, by syntactically removing them, along with the preceding
+   path components. This will produce
+   erroneous results when the path contains symlinks. If the path contains leading @\&quot;..\&quot;@ components, or more @\&quot;..\&quot;@ components than preceeding normal
+   components, then the @\&quot;..\&quot;@ components can't be normalised away. In this case, the result is @Nothing@.
+-}</span><span>
+</span><a name="line-405"></a><span class="hs-identifier">guess_dotdot_comps</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">String</span><span class="hs-special">]</span><span>          </span><span class="hs-comment">-- ^ List of path components</span><span>
+</span><a name="line-406"></a><span>                   </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">Maybe</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">String</span><span class="hs-special">]</span><span>    </span><span class="hs-comment">-- ^ In case the path could be transformed, the @\&quot;..\&quot;@-component free list of path components.</span><span>
+</span><a name="line-407"></a><a name="guess_dotdot_comps"><a href="System.Path.NameManip.html#guess_dotdot_comps"><span class="hs-identifier">guess_dotdot_comps</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042249"><span class="hs-identifier hs-var">guess_dotdot_comps'</span></a><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a name="line-408"></a><span>   </span><span class="hs-keyword">where</span><span>
+</span><a name="line-409"></a><span>      </span><a name="local-6989586621679042249"><a href="#local-6989586621679042249"><span class="hs-identifier">guess_dotdot_comps'</span></a></a><span> </span><a name="local-6989586621679042250"><a href="#local-6989586621679042250"><span class="hs-identifier">schon</span></a></a><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">Just</span><span> </span><a href="#local-6989586621679042250"><span class="hs-identifier hs-var">schon</span></a><span>
+</span><a name="line-410"></a><span>      </span><span class="hs-identifier">guess_dotdot_comps'</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;..&quot;</span><span class="hs-glyph">:</span><span class="hs-identifier">_</span><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-identifier hs-var">Nothing</span><span>
+</span><a name="line-411"></a><span>      </span><span class="hs-identifier">guess_dotdot_comps'</span><span> </span><a name="local-6989586621679042251"><a href="#local-6989586621679042251"><span class="hs-identifier">schon</span></a></a><span> </span><span class="hs-special">(</span><span class="hs-string">&quot;..&quot;</span><span class="hs-glyph">:</span><a name="local-6989586621679042252"><a href="#local-6989586621679042252"><span class="hs-identifier">teile</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042249"><span class="hs-identifier hs-var">guess_dotdot_comps'</span></a><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-var">reverse</span><span> </span><span class="hs-operator hs-var">.</span><span> </span><span class="hs-identifier hs-var">tail</span><span> </span><span class="hs-operator hs-var">.</span><span> </span><span class="hs-identifier hs-var">reverse</span><span> </span><span class="hs-operator hs-var">$</span><span> </span><a href="#local-6989586621679042251"><span class="hs-identifier hs-var">schon</span></a><span class="hs-special">)</span><span> </span><a href="#local-6989586621679042252"><span class="hs-identifier hs-var">teile</span></a><span>
+</span><a name="line-412"></a><span>      </span><span class="hs-identifier">guess_dotdot_comps'</span><span> </span><a name="local-6989586621679042253"><a href="#local-6989586621679042253"><span class="hs-identifier">schon</span></a></a><span> </span><span class="hs-special">(</span><a name="local-6989586621679042254"><a href="#local-6989586621679042254"><span class="hs-identifier">teil</span></a></a><span class="hs-glyph">:</span><a name="local-6989586621679042255"><a href="#local-6989586621679042255"><span class="hs-identifier">teile</span></a></a><span class="hs-special">)</span><span> </span><span class="hs-glyph">=</span><span> </span><a href="#local-6989586621679042249"><span class="hs-identifier hs-var">guess_dotdot_comps'</span></a><span> </span><span class="hs-special">(</span><a href="#local-6989586621679042253"><span class="hs-identifier hs-var">schon</span></a><span> </span><span class="hs-operator hs-var">++</span><span> </span><span class="hs-special">[</span><a href="#local-6989586621679042254"><span class="hs-identifier hs-var">teil</span></a><span class="hs-special">]</span><span class="hs-special">)</span><span> </span><a href="#local-6989586621679042255"><span class="hs-identifier hs-var">teile</span></a><span>
+</span><a name="line-413"></a><span>
+</span><a name="line-414"></a><span>
+</span><a name="line-415"></a><span class="hs-comment">{- | Guess the @\&quot;..\&quot;@-component free, normalised form of a path. The transformation is purely syntactic. @\&quot;..\&quot;@ path components will be removed, along
+   with their preceding path components. This will produce
+   erroneous results when the path contains symlinks. If the path contains leading @\&quot;..\&quot;@ components, or more @\&quot;..\&quot;@ components than preceeding normal
+   components, then the @\&quot;..\&quot;@ components can't be normalised away. In this case, the result is @Nothing@.
+
+&gt;guess_dotdot = fmap unslice_path . guess_dotdot_comps . slice_path
+-}</span><span>
+</span><a name="line-422"></a><span class="hs-identifier">guess_dotdot</span><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">String</span><span>                  </span><span class="hs-comment">-- ^ Path to be normalised</span><span>
+</span><a name="line-423"></a><span>             </span><span class="hs-glyph">-&gt;</span><span> </span><span class="hs-identifier hs-type">Maybe</span><span> </span><span class="hs-identifier hs-type">String</span><span>            </span><span class="hs-comment">-- ^ In case the path could be transformed, the normalised, @\&quot;..\&quot;@-component free form of the path.</span><span>
+</span><a name="line-424"></a><a name="guess_dotdot"><a href="System.Path.NameManip.html#guess_dotdot"><span class="hs-identifier">guess_dotdot</span></a></a><span> </span><span class="hs-glyph">=</span><span>
+</span><a name="line-425"></a><span>   </span><span class="hs-identifier hs-var">fmap</span><span> </span><a href="System.Path.NameManip.html#unslice_path"><span class="hs-identifier hs-var">unslice_path</span></a><span> </span><span class="hs-operator hs-var">.</span><span> </span><a href="System.Path.NameManip.html#guess_dotdot_comps"><span class="hs-identifier hs-var">guess_dotdot_comps</span></a><span> </span><span class="hs-operator hs-var">.</span><span> </span><a href="System.Path.NameManip.html#slice_path"><span class="hs-identifier hs-var">slice_path</span></a><span>
+</span><a name="line-426"></a></pre></body></html>

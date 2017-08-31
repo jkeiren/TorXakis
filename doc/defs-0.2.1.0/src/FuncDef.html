@@ -1,0 +1,23 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-
+TorXakis - Model Based Testing
+Copyright (c) 2015-2017 TNO and Radboud University
+See LICENSE at root directory of this repository.
+-}</span><span>
+</span><a name="line-6"></a><span class="hs-pragma">{-# LANGUAGE DeriveGeneric, DeriveAnyClass #-}</span><span>
+</span><a name="line-7"></a><span>
+</span><a name="line-8"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">FuncDef</span><span>
+</span><a name="line-9"></a><span class="hs-keyword">where</span><span>
+</span><a name="line-10"></a><span>
+</span><a name="line-11"></a><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">GHC</span><span class="hs-operator">.</span><span class="hs-identifier">Generics</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Generic</span><span class="hs-special">)</span><span>
+</span><a name="line-12"></a><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">Control</span><span class="hs-operator">.</span><span class="hs-identifier">DeepSeq</span><span>
+</span><a name="line-13"></a><span>
+</span><a name="line-14"></a><span class="hs-keyword">import</span><span> </span><a href="VarId.html"><span class="hs-identifier">VarId</span></a><span>
+</span><a name="line-15"></a><span class="hs-keyword">import</span><span> </span><a href="ValExprDefs.html"><span class="hs-identifier">ValExprDefs</span></a><span>
+</span><a name="line-16"></a><span>
+</span><a name="line-17"></a><span class="hs-keyword">data</span><span>  </span><a name="FuncDef"><a href="FuncDef.html#FuncDef"><span class="hs-identifier">FuncDef</span></a></a><span>        </span><span class="hs-glyph">=</span><span> </span><a name="FuncDef"><a href="FuncDef.html#FuncDef"><span class="hs-identifier">FuncDef</span></a></a><span>    </span><span class="hs-special">[</span><a href="VarId.html#VarId"><span class="hs-identifier hs-type">VarId</span></a><span class="hs-special">]</span><span> </span><a href="ValExprDefs.html#VExpr"><span class="hs-identifier hs-type">VExpr</span></a><span>
+</span><a name="line-18"></a><span>     </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Ord</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Read</span><span class="hs-special">,</span><span class="hs-identifier hs-type">Show</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Generic</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">NFData</span><span class="hs-special">)</span><span>
+</span><a name="line-19"></a><span>
+</span><a name="line-20"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-21"></a><span class="hs-comment">--</span><span>
+</span><a name="line-22"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-23"></a></pre></body></html>
