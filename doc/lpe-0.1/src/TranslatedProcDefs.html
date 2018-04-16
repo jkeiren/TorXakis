@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-
+TorXakis - Model Based Testing
+Copyright (c) 2015-2017 TNO and Radboud University
+See LICENSE at root directory of this repository.
+-}</span><span>
+</span><a name="line-6"></a><span>
+</span><a name="line-7"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-8"></a><span>
+</span><a name="line-9"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">TranslatedProcDefs</span><span>
+</span><a name="line-10"></a><span>
+</span><a name="line-11"></a><span class="hs-keyword">where</span><span>
+</span><a name="line-12"></a><span>
+</span><a name="line-13"></a><span class="hs-keyword">import</span><span> </span><span class="hs-identifier">ProcId</span><span>
+</span><a name="line-14"></a><span>
+</span><a name="line-15"></a><span>
+</span><a name="line-16"></a><span class="hs-comment">-- | TranslatedProcDefs</span><span>
+</span><a name="line-17"></a><span class="hs-comment">-- keeping track of already translated ProcDefs to avoid double work and loops</span><span>
+</span><a name="line-18"></a><span class="hs-keyword">data</span><span> </span><a name="TranslatedProcDefs"><a href="TranslatedProcDefs.html#TranslatedProcDefs"><span class="hs-identifier">TranslatedProcDefs</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a name="TranslatedProcDefs"><a href="TranslatedProcDefs.html#TranslatedProcDefs"><span class="hs-identifier">TranslatedProcDefs</span></a></a><span>
+</span><a name="line-19"></a><span>  </span><span class="hs-special">{</span><span> </span><a name="lPreGNF"><a href="TranslatedProcDefs.html#lPreGNF"><span class="hs-identifier">lPreGNF</span></a></a><span>  </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">ProcId</span><span class="hs-special">]</span><span>
+</span><a name="line-20"></a><span>  </span><span class="hs-special">,</span><span> </span><a name="lGNF"><a href="TranslatedProcDefs.html#lGNF"><span class="hs-identifier">lGNF</span></a></a><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">ProcId</span><span class="hs-special">]</span><span>
+</span><a name="line-21"></a><span>  </span><span class="hs-special">,</span><span> </span><a name="lLPE"><a href="TranslatedProcDefs.html#lLPE"><span class="hs-identifier">lLPE</span></a></a><span>     </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">ProcId</span><span class="hs-special">]</span><span>
+</span><a name="line-22"></a><span>  </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Ord</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Read</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Show</span><span class="hs-special">)</span><span>
+</span><a name="line-23"></a><span>
+</span><a name="line-24"></a><span class="hs-identifier">emptyTranslatedProcDefs</span><span> </span><span class="hs-glyph">::</span><span> </span><a href="TranslatedProcDefs.html#TranslatedProcDefs"><span class="hs-identifier hs-type">TranslatedProcDefs</span></a><span>
+</span><a name="line-25"></a><a name="emptyTranslatedProcDefs"><a href="TranslatedProcDefs.html#emptyTranslatedProcDefs"><span class="hs-identifier">emptyTranslatedProcDefs</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a href="TranslatedProcDefs.html#TranslatedProcDefs"><span class="hs-identifier hs-var">TranslatedProcDefs</span></a><span> </span><span class="hs-special">{</span><span> </span><span class="hs-identifier">TranslatedProcDefs</span><span class="hs-operator">.</span><span class="hs-identifier">lPreGNF</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a name="line-26"></a><span>                                             </span><span class="hs-special">,</span><span> </span><span class="hs-identifier">TranslatedProcDefs</span><span class="hs-operator">.</span><span class="hs-identifier">lGNF</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span>
+</span><a name="line-27"></a><span>                                             </span><span class="hs-special">,</span><span> </span><span class="hs-identifier">TranslatedProcDefs</span><span class="hs-operator">.</span><span class="hs-identifier">lLPE</span><span> </span><span class="hs-glyph">=</span><span> </span><span class="hs-special">[</span><span class="hs-special">]</span><span> </span><span class="hs-special">}</span><span>
+</span><a name="line-28"></a></pre></body></html>
