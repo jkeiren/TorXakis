@@ -1,0 +1,31 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><link rel="stylesheet" type="text/css" href="style.css" /><script type="text/javascript" src="highlight.js"></script></head><body><pre><span class="hs-comment">{-
+TorXakis - Model Based Testing
+Copyright (c) 2015-2017 TNO and Radboud University
+See LICENSE at root directory of this repository.
+-}</span><span>
+</span><a name="line-6"></a><span class="hs-pragma">{-# LANGUAGE DeriveAnyClass     #-}</span><span>
+</span><a name="line-7"></a><span class="hs-pragma">{-# LANGUAGE DeriveDataTypeable #-}</span><span>
+</span><a name="line-8"></a><span class="hs-pragma">{-# LANGUAGE DeriveGeneric      #-}</span><span>
+</span><a name="line-9"></a><span class="hs-comment">-- ----------------------------------------------------------------------------------------- --</span><span>
+</span><a name="line-10"></a><span>
+</span><a name="line-11"></a><span class="hs-keyword">module</span><span> </span><span class="hs-identifier">ChanId</span><span>
+</span><a name="line-12"></a><span>
+</span><a name="line-13"></a><span class="hs-keyword">where</span><span>
+</span><a name="line-14"></a><span>
+</span><a name="line-15"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Control</span><span class="hs-operator">.</span><span class="hs-identifier">DeepSeq</span><span>
+</span><a name="line-16"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Data</span><span class="hs-operator">.</span><span class="hs-identifier">Data</span><span>
+</span><a name="line-17"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">GHC</span><span class="hs-operator">.</span><span class="hs-identifier">Generics</span><span>    </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Generic</span><span class="hs-special">)</span><span>
+</span><a name="line-18"></a><span>
+</span><a name="line-19"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Id</span><span>
+</span><a name="line-20"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">Name</span><span>
+</span><a name="line-21"></a><span class="hs-keyword">import</span><span>           </span><span class="hs-identifier">SortId</span><span>
+</span><a name="line-22"></a><span>
+</span><a name="line-23"></a><span class="hs-keyword">data</span><span> </span><a name="ChanId"><a href="ChanId.html#ChanId"><span class="hs-identifier">ChanId</span></a></a><span> </span><span class="hs-glyph">=</span><span> </span><a name="ChanId"><a href="ChanId.html#ChanId"><span class="hs-identifier">ChanId</span></a></a><span>
+</span><a name="line-24"></a><span>    </span><span class="hs-special">{</span><span> </span><a name="name"><a href="ChanId.html#name"><span class="hs-identifier">name</span></a></a><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">Name</span><span>
+</span><a name="line-25"></a><span>    </span><span class="hs-special">,</span><span> </span><a name="unid"><a href="ChanId.html#unid"><span class="hs-identifier">unid</span></a></a><span>      </span><span class="hs-glyph">::</span><span> </span><span class="hs-identifier hs-type">Id</span><span>
+</span><a name="line-26"></a><span>    </span><span class="hs-special">,</span><span> </span><a name="chansorts"><a href="ChanId.html#chansorts"><span class="hs-identifier">chansorts</span></a></a><span> </span><span class="hs-glyph">::</span><span> </span><span class="hs-special">[</span><span class="hs-identifier hs-type">SortId</span><span class="hs-special">]</span><span>
+</span><a name="line-27"></a><span>    </span><span class="hs-special">}</span><span> </span><span class="hs-keyword">deriving</span><span> </span><span class="hs-special">(</span><span class="hs-identifier hs-type">Eq</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Ord</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Read</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Show</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Generic</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">NFData</span><span class="hs-special">,</span><span> </span><span class="hs-identifier hs-type">Data</span><span class="hs-special">)</span><span>
+</span><a name="line-28"></a><span>
+</span><a name="line-29"></a><span class="hs-keyword">instance</span><span> </span><span class="hs-identifier hs-type">Resettable</span><span> </span><a href="ChanId.html#ChanId"><span class="hs-identifier hs-type">ChanId</span></a><span>
+</span><a name="line-30"></a><span class="hs-keyword">instance</span><span> </span><span class="hs-identifier hs-type">Identifiable</span><span> </span><a href="ChanId.html#ChanId"><span class="hs-identifier hs-type">ChanId</span></a><span>
+</span><a name="line-31"></a></pre></body></html>

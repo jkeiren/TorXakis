@@ -223,7 +223,6 @@ module BehExprDefs
 
 -- | BExprView: the public view of Behaviour Expression <a>BExpr</a>
 data BExprView
-Stop :: BExprView
 ActionPref :: ActOffer -> BExpr -> BExprView
 Guard :: VExpr -> BExpr -> BExprView
 Choice :: [BExpr] -> BExprView
@@ -279,18 +278,52 @@ Trans :: StatId -> ActOffer -> VEnv -> StatId -> Trans
 -- | Equality modulo unique id's. Compare two behavior expressions for
 --   equality ignoring the differences in identifiers.
 (~~) :: BExpr -> BExpr -> Bool
+
+-- | Create a Stop behaviour expression. The Stop behaviour is equal to
+--   dead lock.
 stop :: BExpr
+
+-- | Is behaviour expression equal to Stop behaviour?
+isStop :: BExpr -> Bool
+
+-- | Create an ActionPrefix behaviour expression.
 actionPref :: ActOffer -> BExpr -> BExpr
+
+-- | Create a guard behaviour expression.
 guard :: VExpr -> BExpr -> BExpr
+
+-- | Create a choice behaviour expression. A choice combines zero or more
+--   behaviour expressions.
 choice :: [BExpr] -> BExpr
+
+-- | Create a parallel behaviour expression. The behaviour expressions must
+--   synchronize on the given set of channels (and EXIT).
 parallel :: [ChanId] -> [BExpr] -> BExpr
+
+-- | Create an enable behaviour expression.
 enable :: BExpr -> [ChanOffer] -> BExpr -> BExpr
+
+-- | Create a disable behaviour expression.
 disable :: BExpr -> BExpr -> BExpr
+
+-- | Create an interrupt behaviour expression.
 interrupt :: BExpr -> BExpr -> BExpr
+
+-- | Create a process instantiation behaviour expression.
 procInst :: ProcId -> [ChanId] -> [VExpr] -> BExpr
+
+-- | Create a hide behaviour expression. The given set of channels is
+--   hidden for its environment.
 hide :: [ChanId] -> BExpr -> BExpr
+
+-- | Create a Value Environment behaviour expression.
 valueEnv :: VEnv -> BExpr -> BExpr
+
+-- | Create a State Automaton behaviour expression.
 stAut :: StatId -> VEnv -> [Trans] -> BExpr
+
+-- | Test if the internal Behaviour Expression structure is valid.
+valid :: BExpr -> Bool
 instance Data.Data.Data BehExprDefs.BExpr
 instance Control.DeepSeq.NFData BehExprDefs.BExpr
 instance GHC.Generics.Generic BehExprDefs.BExpr

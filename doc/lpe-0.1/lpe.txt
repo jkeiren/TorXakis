@@ -19,11 +19,15 @@ gnf :: (EnvB envb) => ProcId -> TranslatedProcDefs -> ProcDefs -> envb ProcDefs
 lpeTransform :: (EnvB envb) => BExpr -> ProcDefs -> envb (Maybe (BExpr, ProcDef))
 lpe :: (EnvB envb) => BExpr -> TranslatedProcDefs -> ProcDefs -> envb (BExpr, ProcDefs)
 lpePar :: (EnvB envb) => BExpr -> TranslatedProcDefs -> ProcDefs -> envb (BExpr, ProcDefs)
+lpeHide :: (EnvB envb) => BExpr -> TranslatedProcDefs -> ProcDefs -> envb (BExpr, ProcDefs)
+preGNFEnable :: (EnvB envb) => BExpr -> TranslatedProcDefs -> ProcDefs -> envb (BExpr, ProcDefs)
 
 
 module LPEfunc
 lpeTransformFunc :: BExpr -> ProcDefs -> Maybe (BExpr, ProcDef)
 lpeParFunc :: BExpr -> TranslatedProcDefs -> ProcDefs -> (BExpr, ProcDefs)
+lpeHideFunc :: BExpr -> Map (Name, Int) VarId -> TranslatedProcDefs -> ProcDefs -> (BExpr, ProcDefs)
+preGNFEnableFunc :: BExpr -> Map (Name, Int) VarId -> TranslatedProcDefs -> ProcDefs -> (BExpr, ProcDefs)
 gnfFunc :: ProcId -> TranslatedProcDefs -> ProcDefs -> ProcDefs
 preGNFFunc :: ProcId -> TranslatedProcDefs -> ProcDefs -> ProcDefs
 eqProcDef :: Maybe (BExpr, ProcDef) -> Maybe (BExpr, ProcDef) -> Bool

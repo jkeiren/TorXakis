@@ -81,7 +81,7 @@ instance Id.Resettable GHC.Types.Int
 instance Id.Resettable a => Id.Resettable [a]
 instance (Id.Resettable a, Id.Resettable b) => Id.Resettable (a, b)
 instance (GHC.Classes.Ord a, Id.Resettable a) => Id.Resettable (Data.Set.Internal.Set a)
-instance (GHC.Classes.Ord k, GHC.Classes.Ord v, Id.Resettable k, Id.Resettable v) => Id.Resettable (Data.Map.Internal.Map k v)
+instance (GHC.Classes.Ord k, Id.Resettable k, Id.Resettable v) => Id.Resettable (Data.Map.Internal.Map k v)
 instance Id.Resettable a => Id.GResettable (GHC.Generics.K1 i a)
 instance Id.GResettable GHC.Generics.U1
 instance (Id.GResettable a, Id.GResettable b) => Id.GResettable (a GHC.Generics.:*: b)
@@ -171,7 +171,7 @@ partitionT :: TermWrapper t => (a -> Bool) -> FreeMonoidX (t a) -> (FreeMonoidX 
 foldOccur :: (a -> Integer -> b -> b) -> b -> FreeMonoidX a -> b
 
 -- | Fold the free-monoid.
-foldFMX :: (IntMultipliable a, Monoid a) => FreeMonoidX a -> a
+foldFMX :: (IntMultipliable a, Monoid a, Semigroup a) => FreeMonoidX a -> a
 
 -- | Append a term to the free-monoid.
 --   
@@ -236,7 +236,7 @@ appendMany :: Ord a => Integer -> a -> FreeMonoidX a -> FreeMonoidX a
 --   </pre>
 --   
 --   Assuming `a &lt; b`.
-flatten :: (Ord a, IntMultipliable a) => FreeMonoidX (FreeMonoidX a) -> FreeMonoidX a
+flatten :: (Ord a) => FreeMonoidX (FreeMonoidX a) -> FreeMonoidX a
 
 -- | `n <a>.</a> x` multiplies <tt>x</tt> <tt>n</tt> times.
 (<.>) :: (IntMultipliable a, Integral n) => n -> a -> a
@@ -304,6 +304,7 @@ instance GHC.Classes.Eq a => GHC.Classes.Eq (FreeMonoidX.FreeMonoidX a)
 instance GHC.Classes.Ord a => FreeMonoidX.IntMultipliable (FreeMonoidX.FreeMonoidX a)
 instance GHC.Show.Show a => GHC.Show.Show (FreeMonoidX.FreeMonoidX a)
 instance (GHC.Classes.Ord a, Id.Resettable a) => Id.Resettable (FreeMonoidX.FreeMonoidX a)
+instance GHC.Classes.Ord a => Data.Semigroup.Semigroup (FreeMonoidX.FreeMonoidX a)
 instance GHC.Classes.Ord a => GHC.Base.Monoid (FreeMonoidX.FreeMonoidX a)
 instance GHC.Classes.Ord a => GHC.Exts.IsList (FreeMonoidX.FreeMonoidX a)
 
@@ -377,6 +378,7 @@ instance GHC.Classes.Ord a => GHC.Classes.Ord (Product.ProductTerm a)
 instance GHC.Classes.Eq a => GHC.Classes.Eq (Product.ProductTerm a)
 instance Id.Resettable a => Id.Resettable (Product.ProductTerm a)
 instance GHC.Base.Applicative Product.ProductTerm
+instance GHC.Num.Num a => Data.Semigroup.Semigroup (Product.ProductTerm a)
 instance GHC.Num.Num a => GHC.Base.Monoid (Product.ProductTerm a)
 instance FreeMonoidX.TermWrapper Product.ProductTerm
 instance GHC.Real.Integral a => FreeMonoidX.IntMultipliable (Product.ProductTerm a)
@@ -599,6 +601,7 @@ instance GHC.Read.Read a => GHC.Read.Read (Sum.SumTerm a)
 instance GHC.Classes.Ord a => GHC.Classes.Ord (Sum.SumTerm a)
 instance GHC.Classes.Eq a => GHC.Classes.Eq (Sum.SumTerm a)
 instance Id.Resettable a => Id.Resettable (Sum.SumTerm a)
+instance GHC.Num.Num a => Data.Semigroup.Semigroup (Sum.SumTerm a)
 instance GHC.Num.Num a => GHC.Base.Monoid (Sum.SumTerm a)
 instance FreeMonoidX.TermWrapper Sum.SumTerm
 instance GHC.Real.Integral a => FreeMonoidX.IntMultipliable (Sum.SumTerm a)

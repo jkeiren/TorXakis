@@ -122,20 +122,23 @@ txsSetSeed :: Int -> IOC ()
 --   Only possible when txscore is initialized.
 txsEval :: VExpr -> IOC (Either String Const)
 
+-- | Type for solve (<tt>txsSolve, </tt>txsUniSolve, and @txsRanSolve)
+type TxsSolveType = VExpr  value expression to solve. -> IOC (WEnv VarId)
+
 -- | Find a solution for the provided Boolean value expression.
 --   
 --   Only possible when txscore is initialized.
-txsSolve :: VExpr -> IOC (WEnv VarId)
+txsSolve :: TxsSolveType
 
 -- | Find an unique solution for the provided Boolean value expression.
 --   
 --   Only possible when txscore is initialized.
-txsUniSolve :: VExpr -> IOC (WEnv VarId)
+txsUniSolve :: TxsSolveType
 
 -- | Find a random solution for the provided Boolean value expression.
 --   
 --   Only possible when txscore is initialized.
-txsRanSolve :: VExpr -> IOC (WEnv VarId)
+txsRanSolve :: TxsSolveType
 
 -- | Show provided item.
 txsShow :: String -> String -> IOC String

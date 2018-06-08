@@ -161,11 +161,10 @@ instance GHC.Classes.Eq RandTrueBins.ParamTrueBins
 module RandPartition
 randValExprsSolvePartition :: (Variable v) => ParamPartition -> [v] -> [ValExpr v] -> SMT (SolveProblem v)
 data ParamPartition
-ParamPartition :: Int -> Int -> Int -> Int -> ParamPartition
+ParamPartition :: Int -> Int -> Int -> ParamPartition
 [maxDepth] :: ParamPartition -> Int
 [intHalf] :: ParamPartition -> Int
 [intNum] :: ParamPartition -> Int
-[adtWidth] :: ParamPartition -> Int
 instance GHC.Show.Show RandPartition.ParamPartition
 instance GHC.Read.Read RandPartition.ParamPartition
 instance GHC.Classes.Ord RandPartition.ParamPartition

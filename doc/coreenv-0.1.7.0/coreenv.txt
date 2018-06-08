@@ -56,6 +56,8 @@ module EnvBasic
 class (Monad envb) => EnvB envb
 newUnid :: EnvB envb => envb Id
 putMsgs :: EnvB envb => [Msg] -> envb ()
+setChanoffers :: EnvB envb => Map (Name, Int) VarId -> envb ()
+getChanoffers :: EnvB envb => envb (Map (Name, Int) VarId)
 
 module ParamCore
 type Params = Map String (String, String -> Bool)
@@ -151,12 +153,13 @@ EnvC :: Config -> Id -> Params -> CoreState -> EnvC
 [state] :: EnvC -> CoreState
 data CoreState
 Noning :: CoreState
-Initing :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ([Msg] -> IOC ()) -> CoreState
+Initing :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ([Msg] -> IOC ()) -> Map (Name, Int) VarId -> CoreState
 [smts] :: CoreState -> Map String SmtEnv
 [tdefs] :: CoreState -> TxsDefs
 [sigs] :: CoreState -> Sigs VarId
 [putmsgs] :: CoreState -> [Msg] -> IOC ()
-Testing :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ModelDef -> Maybe MapperDef -> Maybe PurpDef -> (Action -> IOC Action) -> IOC Action -> [(StateNr, Action, StateNr)] -> StateNr -> StateNr -> BTree -> BTree -> [(GoalId, Either BTree PurpVerdict)] -> ([Msg] -> IOC ()) -> CoreState
+[chanoffers] :: CoreState -> Map (Name, Int) VarId
+Testing :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ModelDef -> Maybe MapperDef -> Maybe PurpDef -> (Action -> IOC Action) -> IOC Action -> [(StateNr, Action, StateNr)] -> StateNr -> StateNr -> BTree -> BTree -> [(GoalId, Either BTree PurpVerdict)] -> ([Msg] -> IOC ()) -> Map (Name, Int) VarId -> CoreState
 [smts] :: CoreState -> Map String SmtEnv
 [tdefs] :: CoreState -> TxsDefs
 [sigs] :: CoreState -> Sigs VarId
@@ -172,7 +175,8 @@ Testing :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ModelDef -> Maybe Mappe
 [mapsts] :: CoreState -> BTree
 [purpsts] :: CoreState -> [(GoalId, Either BTree PurpVerdict)]
 [putmsgs] :: CoreState -> [Msg] -> IOC ()
-Simuling :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ModelDef -> Maybe MapperDef -> (Action -> IOC Action) -> IOC Action -> [(StateNr, Action, StateNr)] -> StateNr -> StateNr -> BTree -> BTree -> ([Msg] -> IOC ()) -> CoreState
+[chanoffers] :: CoreState -> Map (Name, Int) VarId
+Simuling :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ModelDef -> Maybe MapperDef -> (Action -> IOC Action) -> IOC Action -> [(StateNr, Action, StateNr)] -> StateNr -> StateNr -> BTree -> BTree -> ([Msg] -> IOC ()) -> Map (Name, Int) VarId -> CoreState
 [smts] :: CoreState -> Map String SmtEnv
 [tdefs] :: CoreState -> TxsDefs
 [sigs] :: CoreState -> Sigs VarId
@@ -186,7 +190,8 @@ Simuling :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ModelDef -> Maybe Mapp
 [modsts] :: CoreState -> BTree
 [mapsts] :: CoreState -> BTree
 [putmsgs] :: CoreState -> [Msg] -> IOC ()
-Stepping :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ModelDef -> [(StateNr, Action, StateNr)] -> StateNr -> StateNr -> StateNr -> Map StateNr BTree -> ([Msg] -> IOC ()) -> CoreState
+[chanoffers] :: CoreState -> Map (Name, Int) VarId
+Stepping :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ModelDef -> [(StateNr, Action, StateNr)] -> StateNr -> StateNr -> StateNr -> Map StateNr BTree -> ([Msg] -> IOC ()) -> Map (Name, Int) VarId -> CoreState
 [smts] :: CoreState -> Map String SmtEnv
 [tdefs] :: CoreState -> TxsDefs
 [sigs] :: CoreState -> Sigs VarId
@@ -197,6 +202,7 @@ Stepping :: Map String SmtEnv -> TxsDefs -> Sigs VarId -> ModelDef -> [(StateNr,
 [maxstate] :: CoreState -> StateNr
 [modstss] :: CoreState -> Map StateNr BTree
 [putmsgs] :: CoreState -> [Msg] -> IOC ()
+[chanoffers] :: CoreState -> Map (Name, Int) VarId
 getSMT :: String -> IOC SmtEnv
 putSMT :: String -> SmtEnv -> IOC ()
 getParams :: [String] -> IOC [(String, String)]
